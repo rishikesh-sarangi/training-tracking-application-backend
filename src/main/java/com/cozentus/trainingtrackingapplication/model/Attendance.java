@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -52,6 +53,8 @@ public class Attendance {
     @Column(name = "topic_percentage_completed")
     private Double topicPercentageCompleted;
     
+    
+    
     @JsonIgnore
     @Column(name = "created_date")
     private LocalDate createdDate;
@@ -62,9 +65,20 @@ public class Attendance {
     
     @JsonIgnore
     @Column(name = "created_by")
-    private String createdBy;
+    private String createdBy = "System";
     		
     @JsonIgnore
     @Column(name = "updated_by")
-    private String updatedBy;
+    private String updatedBy = "System";
+    
+    @PrePersist
+    protected void onCreate() {
+        createdDate = LocalDate.now(ZoneOffset.UTC);
+        updatedDate = LocalDate.now(ZoneOffset.UTC);
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedDate = LocalDate.now(ZoneOffset.UTC);
+    }
 }
