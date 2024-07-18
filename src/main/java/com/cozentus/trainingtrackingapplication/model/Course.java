@@ -32,11 +32,11 @@ public class Course {
 	private Integer courseId;
 
 	@NotNull
-	@Column(name = "course_name", length = 255)
+	@Column(name = "course_name")
 	private String courseName;
 
 	@NotNull
-	@Column(name = "code", length = 50)
+	@Column(name = "code")
 	private String code;
 
 	@NotNull
@@ -61,11 +61,11 @@ public class Course {
 	@JsonIgnore
 	private LocalDate updatedDate;
 
-	@Column(name = "created_by", length = 50)
+	@Column(name = "created_by")
 	@JsonIgnore
 	private String createdBy = "System";
 
-	@Column(name = "updated_by", length = 50)
+	@Column(name = "updated_by")
 	@JsonIgnore
 	private String updatedBy = "System";
 
@@ -82,5 +82,8 @@ public class Course {
 	@ManyToMany(mappedBy = "courses")
 	private Set<Teacher> teachers;	
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+	private List<Evaluation> evaluations;
 
 }

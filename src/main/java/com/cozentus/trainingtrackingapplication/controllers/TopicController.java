@@ -67,11 +67,15 @@ public class TopicController {
 
 	@PutMapping("/{topicId}")
 	public ResponseEntity<Topic> editTopic(@PathVariable Integer topicId, @RequestBody Topic topic) {
-		Optional<Topic> updatedTopic = Optional.of(topicService.editTopic(topicId, topic));
-		if (updatedTopic.isPresent()) {
-			return new ResponseEntity<>(updatedTopic.get(), HttpStatus.OK);
+		try {
+			Optional<Topic> updatedTopic = Optional.of(topicService.editTopic(topicId, topic));
+			if (updatedTopic.isPresent()) {
+				return new ResponseEntity<>(updatedTopic.get(), HttpStatus.OK);
+			}
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@PostMapping(value = "/upload/{topicId}", consumes = "multipart/form-data")

@@ -7,8 +7,11 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cozentus.trainingtrackingapplication.dto.TeacherBatchProgramCourseDTO;
+import com.cozentus.trainingtrackingapplication.dto.TeacherEditDTO;
 import com.cozentus.trainingtrackingapplication.model.Course;
 import com.cozentus.trainingtrackingapplication.model.Teacher;
+import com.cozentus.trainingtrackingapplication.repository.BatchRepository;
 import com.cozentus.trainingtrackingapplication.repository.CourseRepository;
 import com.cozentus.trainingtrackingapplication.repository.TeacherRepository;
 
@@ -22,6 +25,12 @@ public class TeacherService {
 
 	@Autowired
 	private CourseRepository courseRepository;
+
+	@Autowired
+	private MyUserService myUserService;
+
+	@Autowired
+	private BatchRepository batchRepository;
 
 	public List<Teacher> getAllTeachers() {
 		return teacherRepository.findAll();
@@ -39,14 +48,14 @@ public class TeacherService {
 		return teacherRepository.save(teacher);
 	}
 
-	public Teacher editTeacher(Integer teacherId, Teacher teacher) {
+	public Teacher editTeacher(Integer teacherId, TeacherEditDTO teacher) {
 		Optional<Teacher> updatedTeacher = teacherRepository.findById(teacherId);
 		if (updatedTeacher.isPresent()) {
 			Teacher teacherToUpdate = updatedTeacher.get();
 			teacherToUpdate.setTeacherName(teacher.getTeacherName());
 			teacherToUpdate.setCourses(teacher.getCourses());
-			if (teacher.getTeacherEmail() != null) {
-				teacherToUpdate.setTeacherEmail(teacher.getTeacherEmail());
+			if (teacher.getNewEmail() != null) {
+				teacherToUpdate.setTeacherEmail(teacher.getNewEmail());
 			}
 			return teacherRepository.save(teacherToUpdate);
 		}
@@ -57,9 +66,19 @@ public class TeacherService {
 	public Boolean deleteTeacher(Integer teacherId) {
 		Optional<Teacher> deletedTeacher = teacherRepository.findById(teacherId);
 		if (deletedTeacher.isPresent()) {
+			batchRepository.deleteByTeacherId(teacherId);
+			myUserService.deleteByEmailId(deletedTeacher.get().getTeacherEmail());
 			teacherRepository.delete(deletedTeacher.get());
 			return true;
 		}
 		return false;
 	}
+
+	public Integer getTeacherId(String teacherEmail) {
+		return teacherRepository.findTeacherIdByTeacherEmail(teacherEmail);
+	}
+	
+	public List<TeacherBatchProgramCourseDTO> getBatchProgramCourseInfoByTeacherId(Integer teacherId) {
+        return teacherRepository.findBatchProgramCourseInfoByTeacherId(teacherId);
+    }
 }

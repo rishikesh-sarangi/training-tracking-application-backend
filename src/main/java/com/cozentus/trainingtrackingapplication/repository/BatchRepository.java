@@ -32,16 +32,19 @@ public interface BatchRepository extends JpaRepository<Batch, Integer> {
 	List<Object[]> findCourseAndTeacherByBatchAndProgram(@Param("batchId") Integer batchId,
 			@Param("programId") Integer programId);
 
+//	delete batch_program_course_teacher based on batchId
 	@Modifying
 	@Transactional
 	@Query(value = "DELETE FROM batch_program_course_teacher WHERE batch_id = :batchId", nativeQuery = true)
 	void deleteByBatchId(@Param("batchId") Integer batchId);
 
+//	delete batch_program_course_teacher based on batchId, programId	
 	@Modifying
 	@Transactional
 	@Query(value = "DELETE FROM batch_program_course_teacher WHERE batch_id = :batchId AND program_id = :programId", nativeQuery = true)
 	void deleteByBatchAndProgramId(@Param("batchId") Integer batchId, @Param("programId") Integer programId);
 
+//	delete batch_program_course_teacher based on batchId, programId, courseId, teacherId
 	@Modifying
 	@Transactional
 	@Query(value = "DELETE FROM batch_program_course_teacher WHERE batch_id = :batchId AND program_id = :programId AND course_id = :courseId AND teacher_id = :teacherId", nativeQuery = true)
@@ -49,14 +52,22 @@ public interface BatchRepository extends JpaRepository<Batch, Integer> {
 			@Param("programId") Integer programId, @Param("courseId") Integer courseId,
 			@Param("teacherId") Integer teacherId);
 
+//	delete batch_program_course_teacher based on courseId
 	@Modifying
 	@Transactional
 	@Query(value = "DELETE FROM batch_program_course_teacher WHERE course_id = :courseId", nativeQuery = true)
 	void deleteByCourseId(@Param("courseId") Integer courseId);
 
+	
+//	delete batch_program_course_teacher based on programId
 	@Modifying
 	@Transactional
 	@Query(value = "DELETE FROM batch_program_course_teacher WHERE program_id = :programId", nativeQuery = true)
 	void deleteByProgramId(@Param("programId") Integer programId);
-
+	
+//	delete batch_program_course_teacher based on teacherId
+	@Modifying
+	@Transactional
+	@Query(value = "DELETE FROM batch_program_course_teacher WHERE teacher_id = :teacherId", nativeQuery = true)
+	void deleteByTeacherId(@Param("teacherId") Integer teacherId);
 }

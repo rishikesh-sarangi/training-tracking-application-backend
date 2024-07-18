@@ -31,11 +31,11 @@ public class Program {
 	private Integer programId;
 
 	@NotNull
-	@Column(name = "program_name", length = 255)
+	@Column(name = "program_name")
 	private String programName;
 
 	@NotNull
-	@Column(name = "program_code", length = 50)
+	@Column(name = "program_code")
 	private String programCode;
 
 	@NotNull
@@ -60,11 +60,11 @@ public class Program {
 	@JsonIgnore
 	private LocalDate updatedDate;
 
-	@Column(name = "created_by", length = 50)
+	@Column(name = "created_by")
 	@JsonIgnore
 	private String createdBy = "System";
 
-	@Column(name = "updated_by", length = 50)
+	@Column(name = "updated_by")
 	@JsonIgnore
 	private String updatedBy = "System";
 	
@@ -85,4 +85,8 @@ public class Program {
     @JsonIgnore
     @ManyToMany(mappedBy = "programs")
     private Set<Student> students;
+    
+    @JsonIgnore
+    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
+    private List<Evaluation> evaluations;
 }

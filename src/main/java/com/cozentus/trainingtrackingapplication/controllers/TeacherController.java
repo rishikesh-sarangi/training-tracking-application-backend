@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cozentus.trainingtrackingapplication.dto.TeacherBatchProgramCourseDTO;
+import com.cozentus.trainingtrackingapplication.dto.TeacherEditDTO;
 import com.cozentus.trainingtrackingapplication.model.Teacher;
 import com.cozentus.trainingtrackingapplication.service.EmailService;
 import com.cozentus.trainingtrackingapplication.service.TeacherService;
@@ -40,27 +42,22 @@ public class TeacherController {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	
 //	need to check if the email is in DB first or not
 	@PostMapping
-	public ResponseEntity<Teacher> createTeacher(@RequestBody Teacher teacher) {
+	public ResponseEntity<Boolean> createTeacher(@RequestBody Teacher teacher) {
 		if (emailService.sendWelcomeEmailTeacher(teacher)) {
-			return saveTeacher(teacher);
+			return new ResponseEntity<>(true, HttpStatus.OK);
 		} else {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+			return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
 	@PutMapping("/{teacherId}")
-	public ResponseEntity<Teacher> updateTeacher(@PathVariable Integer teacherId, @RequestBody Teacher teacher) {
-		if (teacher.getTeacherEmail() != null) {
-			if (emailService.sendWelcomeEmailTeacher(teacher)) {
-				return editTeacher(teacherId, teacher);
-			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-			}
+	public ResponseEntity<Boolean> updateTeacher(@PathVariable Integer teacherId, @RequestBody TeacherEditDTO teacher) {
+		if (emailService.sendWelcomeEmailTeacherEdit(teacherId, teacher)) {
+			return new ResponseEntity<>(true, HttpStatus.OK);
 		} else {
-			return editTeacher(teacherId, teacher);
+			return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -73,16 +70,21 @@ public class TeacherController {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	private ResponseEntity<Teacher> editTeacher(Integer teacherId, Teacher teacher) {
-		Optional<Teacher> updatedTeacher = Optional.ofNullable(teacherService.editTeacher(teacherId, teacher));
-
-		return updatedTeacher.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+	@GetMapping("/{teacherEmail}")
+	public ResponseEntity<Integer> getTeacherIdByTeacherEmail(@PathVariable String teacherEmail) {
+		Optional<Integer> teacherId = Optional.ofNullable(teacherService.getTeacherId(teacherEmail));
+		if (teacherId.isPresent()) {
+			return new ResponseEntity<>(teacherId.get(), HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
-
-	private ResponseEntity<Teacher> saveTeacher(Teacher teacher) {
-		Optional<Teacher> createdTeacher = Optional.ofNullable(teacherService.addTeacher(teacher));
-
-		return createdTeacher.map(t -> ResponseEntity.status(HttpStatus.CREATED).body(t))
-				.orElse(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-	}
+	
+    @GetMapping("/{teacherId}/batch-program-course-info")
+    public ResponseEntity<List<TeacherBatchProgramCourseDTO>> getBatchProgramCourseInfo(@PathVariable Integer teacherId) {    	
+    	Optional<List<TeacherBatchProgramCourseDTO>> info = Optional.ofNullable(teacherService.getBatchProgramCourseInfoByTeacherId(teacherId));
+		if (info.isPresent()) {
+			return new ResponseEntity<>(info.get(), HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
 }

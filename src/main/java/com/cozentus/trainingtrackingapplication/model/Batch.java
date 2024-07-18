@@ -2,6 +2,7 @@ package com.cozentus.trainingtrackingapplication.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -38,11 +40,11 @@ public class Batch {
 	private Integer batchId;
 
 	@NotNull
-	@Column(name = "batch_name", length = 255)
+	@Column(name = "batch_name")
 	private String batchName;
 
 	@NotNull
-	@Column(name = "batch_code", length = 50)
+	@Column(name = "batch_code")
 	private String batchCode;
 
 	@NotNull
@@ -60,11 +62,11 @@ public class Batch {
 	@JsonIgnore
 	private LocalDateTime updatedDate;
 
-	@Column(name = "created_by", length = 50)
+	@Column(name = "created_by")
 	@JsonIgnore
 	private String createdBy = "System";
 
-	@Column(name = "updated_by", length = 50)
+	@Column(name = "updated_by")
 	@JsonIgnore
 	private String updatedBy = "System";
 	
@@ -79,5 +81,9 @@ public class Batch {
 //	@JsonManagedReference
 	@JsonIgnore
 	@OneToMany(mappedBy = "batch")
-    private Set<Student> students;	
+    private Set<Student> students;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "batch", cascade = CascadeType.ALL)
+	private List<Evaluation> evaluations;
 }

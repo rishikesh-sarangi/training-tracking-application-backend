@@ -1,11 +1,8 @@
 package com.cozentus.trainingtrackingapplication.model;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -14,14 +11,20 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 @Entity
 @Table(name = "Topic")
 public class Topic {
@@ -41,7 +44,7 @@ public class Topic {
     private Integer order;
 
     @NotNull
-    @Column(name = "topic_name", length = 255)
+    @Column(name = "topic_name")
     private String topicName;
 
     @NotNull
@@ -57,7 +60,7 @@ public class Topic {
     private Integer practiceTime;
 
     @NotNull
-    @Column(name = "summary", columnDefinition = "TEXT")
+    @Column(name = "summary")
     private String summary;
     
     @JsonManagedReference
@@ -74,11 +77,11 @@ public class Topic {
 	@JsonIgnore
 	private LocalDate updatedDate;
 
-	@Column(name = "created_by", length = 50)
+	@Column(name = "created_by")
 	@JsonIgnore
 	private String createdBy = "System";
 
-	@Column(name = "updated_by", length = 50)
+	@Column(name = "updated_by")
 	@JsonIgnore
     private String updatedBy = "System";
 	

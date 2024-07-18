@@ -37,15 +37,15 @@ public class Student {
 	private Integer studentId;
 
 	@NotNull
-	@Column(name = "name", length = 50)
+	@Column(name = "name")
 	private String studentName;
 
 	@NotNull
-	@Column(name = "email", length = 50)
+	@Column(name = "email")
 	private String studentEmail;
 
 	@NotNull
-	@Column(name = "student_code", length = 10)
+	@Column(name = "student_code")
 	private String studentCode;
 	
 
@@ -59,11 +59,11 @@ public class Student {
 	@JsonIgnore
 	private LocalDate updatedDate;
 
-	@Column(name = "created_by", length = 50)
+	@Column(name = "created_by")
 	@JsonIgnore
 	private String createdBy = "System";
 
-	@Column(name = "updated_by", length = 50)
+	@Column(name = "updated_by")
 	@JsonIgnore
 	private String updatedBy = "System";
 	

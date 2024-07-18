@@ -18,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -38,11 +39,11 @@ public class Teacher {
 	private Integer teacherId;
 
 	@NotNull
-	@Column(name = "name", length = 50)
+	@Column(name = "name")
 	private String teacherName;
 
 	@NotNull
-	@Column(name = "email", length = 50)
+	@Column(name = "email")
 	private String teacherEmail;
 
 	@CreationTimestamp
@@ -55,23 +56,21 @@ public class Teacher {
 	@JsonIgnore
 	private LocalDate updatedDate;
 
-	@Column(name = "created_by", length = 50)
+	@Column(name = "created_by")
 	@JsonIgnore
 	private String createdBy = "System";
 
-	@Column(name = "updated_by", length = 50)
+	@Column(name = "updated_by")
 	@JsonIgnore
 	private String updatedBy = "System";
-	
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinTable(
-        name = "teacher_course",
-        joinColumns = @JoinColumn(name = "teacher_id"),
-        inverseJoinColumns = @JoinColumn(name = "course_id")
-    )
-    @JsonIgnoreProperties("topics")
+
+	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
+	@JoinTable(name = "teacher_course", joinColumns = @JoinColumn(name = "teacher_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
+	@JsonIgnoreProperties("topics")
 	private List<Course> courses;
 	
-	
+	@JsonIgnore
+	@OneToMany(mappedBy = "teacher",cascade = CascadeType.ALL)
+	private List<Evaluation> evaluations;
 
 }

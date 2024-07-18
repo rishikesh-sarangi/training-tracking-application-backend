@@ -24,7 +24,7 @@ import com.cozentus.trainingtrackingapplication.service.BatchService;
 public class BatchProgramCourseTeacherController {
 	@Autowired
 	private BatchProgramCourseTeacherService batchProgramCourseTeacherService;
-	
+
 	@Autowired
 	private BatchService batchService;
 
@@ -33,19 +33,19 @@ public class BatchProgramCourseTeacherController {
 		batchProgramCourseTeacherService.updateBatchProgramCourseTeacher(dto);
 		return ResponseEntity.ok(true);
 	}
-	
-    @GetMapping("/{batchId}/{programId}")
-    public ResponseEntity<List<BatchProgramCourseTeacherDTO>> getCourseAndTeacherByBatchAndProgram(
-            @PathVariable Integer batchId,
-            @PathVariable Integer programId) {
-        List<BatchProgramCourseTeacherDTO> result = batchProgramCourseTeacherService.getCourseAndTeacherByBatchAndProgram(batchId, programId);
-        return ResponseEntity.ok(result);
-    }
-    
-    
+
+	@GetMapping("/{batchId}/{programId}")
+	public ResponseEntity<List<BatchProgramCourseTeacherDTO>> getCourseAndTeacherByBatchAndProgram(
+			@PathVariable Integer batchId, @PathVariable Integer programId) {
+		List<BatchProgramCourseTeacherDTO> result = batchProgramCourseTeacherService
+				.getCourseAndTeacherByBatchAndProgram(batchId, programId);
+		return ResponseEntity.ok(result);
+	}
+
 //    this is a delete function even tho we are using post mapping
-    @PostMapping
-	public ResponseEntity<Boolean> deleteBatchProgramCourseTeacherByBatchId(@RequestBody BatchProgramCourseTeacherDeleteDTO dto) {
+	@PostMapping
+	public ResponseEntity<Boolean> deleteBatchProgramCourseTeacherByBatchId(
+			@RequestBody BatchProgramCourseTeacherDeleteDTO dto) {
 		batchService.deleteByBatchIdAndProgramIdAndCourseIdAndTeacherId(dto);
 		return ResponseEntity.ok(true);
 	}

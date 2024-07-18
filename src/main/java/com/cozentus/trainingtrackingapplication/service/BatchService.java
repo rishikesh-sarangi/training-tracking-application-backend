@@ -90,9 +90,9 @@ public class BatchService {
 	                "No courses found for batch id: " + batchId + " and program id: " + programId);
 	    }
 	    
-	    List<Course> courses = courseData.stream().map(this::mapToCourse).collect(Collectors.toList());
+	    List<Course> courses = courseData.stream().map(this::mapToCourse).toList();
 	    
-	    List<Integer> courseIds = courses.stream().map(Course::getCourseId).collect(Collectors.toList());
+	    List<Integer> courseIds = courses.stream().map(Course::getCourseId).toList();
 	    Map<Integer, Set<Teacher>> teachersByCourseId = fetchTeachersForCourses(courseIds);
 	    
 	    return convertToCourseDTOList(courses, teachersByCourseId);
