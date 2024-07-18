@@ -89,4 +89,8 @@ public class Program {
     @JsonIgnore
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
     private List<Evaluation> evaluations;
+    
+    @JsonIgnore
+	@OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
+	private List<Attendance> attendance;
 }

@@ -85,6 +85,10 @@ public class Topic {
 	@JsonIgnore
     private String updatedBy = "System";
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Attendance> attendance;
+	
     public void addFile(TableFiles file) {
         files.add(file);
         file.setTopic(this);

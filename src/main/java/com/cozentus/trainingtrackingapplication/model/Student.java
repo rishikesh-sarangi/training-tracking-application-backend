@@ -1,6 +1,7 @@
 package com.cozentus.trainingtrackingapplication.model;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
@@ -17,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -80,4 +82,8 @@ public class Student {
         inverseJoinColumns = @JoinColumn(name = "program_id")
     )
     private Set<Program> programs;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<EvaluationStudent> evaluationStudents;
 }

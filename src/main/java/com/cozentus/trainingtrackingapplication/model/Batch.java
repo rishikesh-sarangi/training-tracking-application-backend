@@ -86,4 +86,8 @@ public class Batch {
 	@JsonIgnore
 	@OneToMany(mappedBy = "batch", cascade = CascadeType.ALL)
 	private List<Evaluation> evaluations;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "batch", cascade = CascadeType.ALL)
+	private List<Attendance> attendance;
 }

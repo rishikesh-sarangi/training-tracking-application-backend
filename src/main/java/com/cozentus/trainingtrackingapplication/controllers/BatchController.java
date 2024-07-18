@@ -75,7 +75,7 @@ public class BatchController {
 		return new ResponseEntity<>(true, HttpStatus.OK);
 	}
 
-//	get the programs and associated students
+//	get the programs and associated students under a certain batch
 	@GetMapping("/{batchId}/programs-and-students")
 	public ResponseEntity<List<ProgramDTO>> getProgramsWithStudentsByBatchId(@PathVariable Integer batchId) {
 		List<ProgramDTO> programsInfo = batchService.getProgramsWithStudentsByBatchId(batchId);

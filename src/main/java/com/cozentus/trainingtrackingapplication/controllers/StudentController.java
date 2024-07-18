@@ -77,6 +77,7 @@ public class StudentController {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 	
+//	get the associated students under a certain program which is under a certain batch
     @GetMapping("/{batchId}/{programId}")
     public ResponseEntity<Set<Student>> getStudentsByBatchAndProgram(
             @PathVariable Integer batchId,

@@ -1,4 +1,4 @@
-package com.cozentus.trainingtrackingapplication.model;
+package com.cozentus.trainingtrackingapplication.dto;
 
 import lombok.Data;
 

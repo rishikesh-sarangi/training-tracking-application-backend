@@ -85,5 +85,10 @@ public class Course {
 	@JsonIgnore
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
 	private List<Evaluation> evaluations;
+	
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+	private List<Attendance> attendance;
 
 }
