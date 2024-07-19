@@ -90,4 +90,8 @@ public class Batch {
 	@JsonIgnore
 	@OneToMany(mappedBy = "batch", cascade = CascadeType.ALL)
 	private List<Attendance> attendance;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "batch", cascade = CascadeType.ALL)
+	private List<BatchProgramCourse> batchProgramCourse;
 }

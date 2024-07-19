@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseDTO;
 import com.cozentus.trainingtrackingapplication.model.Course;
 import com.cozentus.trainingtrackingapplication.service.CourseService;
+import com.cozentus.trainingtrackingapplication.util.ResponseUtil;
 
 @RestController
 @CrossOrigin("http://localhost:4200/")
@@ -61,5 +63,17 @@ public class CourseController {
 			return new ResponseEntity<>(updatedCourse.get(), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+	}
+
+	@PostMapping("/by-batch-program-teacher")
+	public ResponseEntity<Object> getCoursesByBatchProgramAndTeacher(
+			@RequestBody BatchProgramCourseDTO batchProgramCourseDTO) {
+		try {
+			List<Course> courses = courseService.getCoursesByBatchProgramAndTeacher(batchProgramCourseDTO);
+			return ResponseUtil.buildSuccessResponse(courses);
+		} catch (Exception e) {
+			return ResponseUtil.buildErrorResponse("Error fetching evaluations: " + e.getMessage(),
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

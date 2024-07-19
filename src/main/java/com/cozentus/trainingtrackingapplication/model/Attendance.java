@@ -54,7 +54,6 @@ public class Attendance {
     private Double topicPercentageCompleted;
     
     
-    
     @JsonIgnore
     @Column(name = "created_date")
     private LocalDate createdDate;

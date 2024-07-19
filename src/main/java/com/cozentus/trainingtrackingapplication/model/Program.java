@@ -93,4 +93,8 @@ public class Program {
     @JsonIgnore
 	@OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
 	private List<Attendance> attendance;
+    
+	@JsonIgnore
+	@OneToMany(mappedBy = "program", cascade = CascadeType.ALL)
+	private List<BatchProgramCourse> batchProgramCourse;
 }

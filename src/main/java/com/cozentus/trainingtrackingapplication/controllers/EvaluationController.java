@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseTeacherResponse;
 import com.cozentus.trainingtrackingapplication.dto.EvaluationDTO;
-import com.cozentus.trainingtrackingapplication.dto.EvaluationFilterDTO;
 import com.cozentus.trainingtrackingapplication.model.Evaluation;
 import com.cozentus.trainingtrackingapplication.service.EvaluationService;
 import com.cozentus.trainingtrackingapplication.util.ResponseUtil;
@@ -56,7 +56,7 @@ public class EvaluationController {
 
 //	this is a get request i'm using post mapping for filtering
 	@PostMapping("/filter")
-	public ResponseEntity<Object> getEvaluationsByFilters(@RequestBody EvaluationFilterDTO filterDTO) {
+	public ResponseEntity<Object> getEvaluationsByFilters(@RequestBody BatchProgramCourseTeacherResponse filterDTO) {
 		try {
 			List<Evaluation> evaluations = evaluationService.getEvaluationsByTeacherBatchProgramAndCourse(
 					filterDTO.getTeacherId(), filterDTO.getBatchId(), filterDTO.getProgramId(),

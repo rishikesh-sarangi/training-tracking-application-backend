@@ -2,10 +2,12 @@ package com.cozentus.trainingtrackingapplication.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseDTO;
 import com.cozentus.trainingtrackingapplication.model.Course;
 import com.cozentus.trainingtrackingapplication.model.Program;
 import com.cozentus.trainingtrackingapplication.model.Teacher;
@@ -87,4 +89,23 @@ public class CourseService {
 		}
 		return null;
 	}
+
+	public List<Course> getCoursesByBatchProgramAndTeacher(BatchProgramCourseDTO batchProgramCourseDTO) {
+		Integer batchId = batchProgramCourseDTO.getBatchId();
+		Integer programId = batchProgramCourseDTO.getProgramId();
+		Integer teacherId = batchProgramCourseDTO.getTeacherId();
+        List<Object[]> results = courseRepository.findCoursesByBatchProgramAndTeacher(batchId, programId, teacherId);
+        return results.stream().map(this::mapToCourse).collect(Collectors.toList());
+    }
+
+    private Course mapToCourse(Object[] row) {
+        Course course = new Course();
+        course.setCourseId((Integer) row[0]);
+        course.setCourseName((String) row[1]);
+        course.setCode((String) row[2]);
+        course.setDescription((String) row[3]);
+        course.setTheoryTime((Integer) row[4]);
+        course.setPracticeTime((Integer) row[5]);
+        return course;
+    }
 }

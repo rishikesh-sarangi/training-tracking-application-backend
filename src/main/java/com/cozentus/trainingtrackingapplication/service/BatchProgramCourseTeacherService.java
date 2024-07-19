@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseTeacherDTO;
 import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseTeacherResponse;
-import com.cozentus.trainingtrackingapplication.repository.BatchProgramCourseRepository;
+import com.cozentus.trainingtrackingapplication.repository.BatchProgramCourseTeacherRepository;
 import com.cozentus.trainingtrackingapplication.repository.BatchRepository;
 import com.cozentus.trainingtrackingapplication.repository.CourseRepository;
 import com.cozentus.trainingtrackingapplication.repository.ProgramRepository;
@@ -32,7 +32,7 @@ public class BatchProgramCourseTeacherService {
 	private ProgramRepository programRepository;
 
 	@Autowired
-	private BatchProgramCourseRepository batchProgramCourseTeacherRepository;
+	private BatchProgramCourseTeacherRepository batchProgramCourseTeacherRepository;
 
 	@Transactional
 	public void updateBatchProgramCourseTeacher(BatchProgramCourseTeacherResponse dto) {
