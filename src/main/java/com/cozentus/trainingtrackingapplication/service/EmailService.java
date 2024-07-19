@@ -4,7 +4,6 @@ import java.security.SecureRandom;
 import java.util.Optional;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -18,14 +17,17 @@ import com.cozentus.trainingtrackingapplication.model.Teacher;
 @Service
 public class EmailService {
 
-	@Autowired
 	private JavaMailSender javaMailSender;
 
-	@Autowired
 	private TeacherService teacherService;
 
-	@Autowired
 	private MyUserService myUserService;
+	
+	EmailService(JavaMailSender javaMailSender, TeacherService teacherService, MyUserService myUserService){		
+		this.javaMailSender = javaMailSender;
+		this.teacherService = teacherService;
+		this.myUserService = myUserService;
+	}
 
 	@Value("${spring.mail.username}")
 	private String sender;

@@ -2,7 +2,6 @@ package com.cozentus.trainingtrackingapplication.service;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.model.MyUsers;
@@ -11,8 +10,12 @@ import com.cozentus.trainingtrackingapplication.repository.MyUserRepository;
 @Service
 public class MyUserService {
 
-	@Autowired
 	private MyUserRepository myUserRepository;
+
+	MyUserService(MyUserRepository myUserRepository) {
+
+		this.myUserRepository = myUserRepository;
+	}
 
 	public MyUsers authenticate(String email, String password) {
 		Optional<MyUsers> userCredentials = myUserRepository.findByUserEmail(email);
@@ -39,7 +42,7 @@ public class MyUserService {
 		if (updatedUser.isPresent()) {
 //			get the user object
 			MyUsers userToUpdate = updatedUser.get();
-			
+
 //			make changes in it
 			userToUpdate.setUsername(userObj.getUsername());
 			if (userObj.getUserEmail() != null) {
@@ -50,7 +53,7 @@ public class MyUserService {
 		}
 		return null;
 	}
-	
+
 	public MyUsers findByEmailId(String userEmail) {
 		Optional<MyUsers> user = myUserRepository.findByUserEmail(userEmail);
 		if (user.isPresent()) {
@@ -58,7 +61,7 @@ public class MyUserService {
 		}
 		return null;
 	}
-	
+
 	public boolean deleteUser(Integer userId) {
 		Optional<MyUsers> user = myUserRepository.findById(userId);
 		if (user.isPresent()) {
@@ -67,7 +70,7 @@ public class MyUserService {
 		}
 		return false;
 	}
-	
+
 	public boolean deleteByEmailId(String userEmail) {
 		Optional<MyUsers> user = myUserRepository.findByUserEmail(userEmail);
 		if (user.isPresent()) {

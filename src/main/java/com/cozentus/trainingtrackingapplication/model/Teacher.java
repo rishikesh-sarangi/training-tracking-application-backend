@@ -1,10 +1,9 @@
 package com.cozentus.trainingtrackingapplication.model;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -19,18 +18,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
+@Entity
 @Table(name = "Teacher")
 public class Teacher {
 	@Id
@@ -46,12 +43,10 @@ public class Teacher {
 	@Column(name = "email")
 	private String teacherEmail;
 
-	@CreationTimestamp
 	@Column(name = "created_date", updatable = false)
 	@JsonIgnore
 	private LocalDate createdDate;
 
-	@UpdateTimestamp
 	@Column(name = "updated_date")
 	@JsonIgnore
 	private LocalDate updatedDate;
@@ -77,8 +72,14 @@ public class Teacher {
 	@OneToMany(mappedBy = "teacher",cascade = CascadeType.ALL)
 	private List<Attendance> attendance;
 	
-	@JsonIgnore
-	@OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL)
-	private List<BatchProgramCourse> batchProgramCourse;
+	@PrePersist
+	protected void onCreate() {
+		createdDate = LocalDate.now(ZoneOffset.UTC);
+		updatedDate = LocalDate.now(ZoneOffset.UTC);
+	}
 
+	@PreUpdate
+	protected void onUpdate() {
+		updatedDate = LocalDate.now(ZoneOffset.UTC);
+	}
 }

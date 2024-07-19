@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.dto.AttendanceDTO;
@@ -17,19 +16,21 @@ import com.cozentus.trainingtrackingapplication.repository.TopicRepository;
 @Service
 public class AttendanceService {
 
-	@Autowired
 	private AttendanceRepository attendanceRepository;
 
-	@Autowired
 	private TopicRepository topicRepository;
-	
+
+	AttendanceService(AttendanceRepository attendanceRepository, TopicRepository topicRepository) {
+		this.attendanceRepository = attendanceRepository;
+		this.topicRepository = topicRepository;
+	}
 
 	public List<Attendance> getAllAttendances() {
 		return attendanceRepository.findAll();
 	}
 
 	public Attendance addAttendance(Attendance attendance) {
-		 return attendanceRepository.save(attendance);
+		return attendanceRepository.save(attendance);
 	}
 
 	public List<Attendance> getAttendanceByTeacherBatchProgramAndCourse(Integer teacherId, Integer batchId,
@@ -61,7 +62,7 @@ public class AttendanceService {
 
 		return attendanceRepository.save(attendanceToBeEdited);
 	}
-	
+
 	public List<Attendance> findByBatchIdAndProgramIdAndTeacherId(AttendanceDTO filterDTO) {
 		Integer batchId = filterDTO.getBatchId();
 		Integer programId = filterDTO.getProgramId();

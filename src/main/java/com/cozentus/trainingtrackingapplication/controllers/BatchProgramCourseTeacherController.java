@@ -1,8 +1,6 @@
 package com.cozentus.trainingtrackingapplication.controllers;
 
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,11 +20,16 @@ import com.cozentus.trainingtrackingapplication.service.BatchService;
 @CrossOrigin("http://localhost:4200/")
 @RequestMapping("/batch-course-teacher")
 public class BatchProgramCourseTeacherController {
-	@Autowired
+
 	private BatchProgramCourseTeacherService batchProgramCourseTeacherService;
 
-	@Autowired
 	private BatchService batchService;
+
+	BatchProgramCourseTeacherController(BatchProgramCourseTeacherService batchProgramCourseTeacherService,
+			BatchService batchService) {
+		this.batchProgramCourseTeacherService = batchProgramCourseTeacherService;
+		this.batchService = batchService;
+	}
 
 	@PostMapping("/update")
 	public ResponseEntity<Boolean> updateBatchCourseTeacher(@RequestBody BatchProgramCourseTeacherResponse dto) {
@@ -46,8 +49,8 @@ public class BatchProgramCourseTeacherController {
 	@PostMapping
 	public ResponseEntity<Boolean> deleteBatchProgramCourseTeacherByBatchId(
 			@RequestBody BatchProgramCourseTeacherDeleteDTO dto) {
+//		Optional<Boolean> deletedBatchProgramCourseTeacher = Optional
 		batchService.deleteByBatchIdAndProgramIdAndCourseIdAndTeacherId(dto);
 		return ResponseEntity.ok(true);
 	}
-
 }

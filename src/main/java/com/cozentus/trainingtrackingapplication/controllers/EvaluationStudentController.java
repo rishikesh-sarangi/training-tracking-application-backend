@@ -32,10 +32,13 @@ public class EvaluationStudentController {
 		try {
 			EvaluationStudent createdEvaluationStudent = evaluationStudentService
 					.addEvaluationStudent(evaluationStudent);
-			return ResponseUtil.buildSuccessResponse(Collections.singletonList(createdEvaluationStudent));
+			if (createdEvaluationStudent != null) {
+				return ResponseUtil.buildSuccessResponse(Collections.singletonList(createdEvaluationStudent));
+			} else {
+				return ResponseUtil.buildErrorResponse("Error creating evaluationStudent", HttpStatus.BAD_REQUEST);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error creating evaluationStudent: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
 
@@ -44,11 +47,13 @@ public class EvaluationStudentController {
 		try {
 			List<EvaluationStudent> createdEvaluationStudent = evaluationStudentService
 					.addMultipleEvaluationStudent(evaluationStudent);
-			return ResponseUtil.buildSuccessResponse(Collections.singletonList(createdEvaluationStudent));
+			if (!createdEvaluationStudent.isEmpty()) {
+				return ResponseUtil.buildSuccessResponse(Collections.singletonList(createdEvaluationStudent));
+			} else {
+				return ResponseUtil.buildErrorResponse("Error creating evaluationStudent", HttpStatus.BAD_REQUEST);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error creating evaluationStudent: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
-	
 }

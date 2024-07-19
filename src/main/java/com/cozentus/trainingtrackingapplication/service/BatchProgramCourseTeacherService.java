@@ -2,7 +2,6 @@ package com.cozentus.trainingtrackingapplication.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseTeacherDTO;
@@ -19,20 +18,25 @@ import jakarta.transaction.Transactional;
 @Service
 public class BatchProgramCourseTeacherService {
 
-	@Autowired
 	private BatchRepository batchRepository;
 
-	@Autowired
 	private CourseRepository courseRepository;
 
-	@Autowired
 	private TeacherRepository teacherRepository;
 
-	@Autowired
 	private ProgramRepository programRepository;
 
-	@Autowired
 	private BatchProgramCourseTeacherRepository batchProgramCourseTeacherRepository;
+
+	BatchProgramCourseTeacherService(BatchProgramCourseTeacherRepository batchProgramCourseTeacherRepository,
+			BatchRepository batchRepository, CourseRepository courseRepository, TeacherRepository teacherRepository,
+			ProgramRepository programRepository) {
+		this.batchProgramCourseTeacherRepository = batchProgramCourseTeacherRepository;
+		this.batchRepository = batchRepository;
+		this.courseRepository = courseRepository;
+		this.teacherRepository = teacherRepository;
+		this.programRepository = programRepository;
+	}
 
 	@Transactional
 	public void updateBatchProgramCourseTeacher(BatchProgramCourseTeacherResponse dto) {
@@ -49,17 +53,13 @@ public class BatchProgramCourseTeacherService {
 				.orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
 
 		// innsert into junction table using custom query
-		batchProgramCourseTeacherRepository.insertBatchProgramCourseTeacher(dto.getBatchId(), dto.getProgramId() ,dto.getCourseId(), dto.getTeacherId());
+		batchProgramCourseTeacherRepository.insertBatchProgramCourseTeacher(dto.getBatchId(), dto.getProgramId(),
+				dto.getCourseId(), dto.getTeacherId());
 	}
-	
+
 	public List<BatchProgramCourseTeacherDTO> getCourseAndTeacherByBatchAndProgram(Integer batchId, Integer programId) {
-        List<Object[]> results = batchRepository.findCourseAndTeacherByBatchAndProgram(batchId, programId);
-        return results.stream().map(obj -> new BatchProgramCourseTeacherDTO(
-                (Integer) obj[0],
-                (String) obj[1],
-                (String) obj[2],
-                (Integer) obj[3],
-                (String) obj[4]
-        )).toList();
-    }
+		List<Object[]> results = batchRepository.findCourseAndTeacherByBatchAndProgram(batchId, programId);
+		return results.stream().map(obj -> new BatchProgramCourseTeacherDTO((Integer) obj[0], (String) obj[1],
+				(String) obj[2], (Integer) obj[3], (String) obj[4])).toList();
+	}
 }

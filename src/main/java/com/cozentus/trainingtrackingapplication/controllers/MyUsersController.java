@@ -2,7 +2,6 @@ package com.cozentus.trainingtrackingapplication.controllers;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -19,9 +18,11 @@ import com.cozentus.trainingtrackingapplication.service.MyUserService;
 @CrossOrigin("http://localhost:4200/")
 @RequestMapping("/users")
 public class MyUsersController {
-
-	@Autowired
 	private MyUserService credentialService;
+
+	MyUsersController(MyUserService credentialService) {
+		this.credentialService = credentialService;
+	}
 
 	@PostMapping("/login")
 	public ResponseEntity<MyUsers> authenticate(@RequestBody CredentialsDTO credentialsDTO) {

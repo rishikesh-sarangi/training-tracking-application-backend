@@ -2,22 +2,16 @@ package com.cozentus.trainingtrackingapplication.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "users")
 public class MyUsers {
@@ -43,12 +37,10 @@ public class MyUsers {
 	@Column(name = "user_role")
 	private String userRole;
 
-	@CreationTimestamp
 	@Column(name = "created_date", updatable = false)
 	@JsonIgnore
 	private LocalDate createdDate;
 
-	@UpdateTimestamp
 	@Column(name = "updated_date")
 	@JsonIgnore
 	private LocalDate updatedDate;
@@ -60,4 +52,15 @@ public class MyUsers {
 	@Column(name = "updated_by")
 	@JsonIgnore
 	private String updatedBy = "System";
+	
+	@PrePersist
+	protected void onCreate() {
+		createdDate = LocalDate.now(ZoneOffset.UTC);
+		updatedDate = LocalDate.now(ZoneOffset.UTC);
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		updatedDate = LocalDate.now(ZoneOffset.UTC);
+	}
 }

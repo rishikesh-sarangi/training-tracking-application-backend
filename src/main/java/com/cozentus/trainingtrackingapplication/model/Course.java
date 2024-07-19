@@ -2,26 +2,20 @@ package com.cozentus.trainingtrackingapplication.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "Course")
 public class Course {
@@ -51,12 +45,10 @@ public class Course {
 	@Column(name = "practice_time")
 	private Integer practiceTime;
 
-	@CreationTimestamp
 	@Column(name = "created_date", updatable = false)
 	@JsonIgnore
 	private LocalDate createdDate;
 
-	@UpdateTimestamp
 	@Column(name = "updated_date")
 	@JsonIgnore
 	private LocalDate updatedDate;
@@ -77,22 +69,27 @@ public class Course {
 	@JsonIgnore
 	@ManyToMany(mappedBy = "courses")
 	private Set<Program> program;
-	
+
 	@JsonIgnore
 	@ManyToMany(mappedBy = "courses")
-	private Set<Teacher> teachers;	
-	
+	private Set<Teacher> teachers;
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
 	private List<Evaluation> evaluations;
-	
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
 	private List<Attendance> attendance;
-	
-	@JsonIgnore
-	@OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-	private List<BatchProgramCourse> batchProgramCourse;
 
+	@PrePersist
+	protected void onCreate() {
+		createdDate = LocalDate.now(ZoneOffset.UTC);
+		updatedDate = LocalDate.now(ZoneOffset.UTC);
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		updatedDate = LocalDate.now(ZoneOffset.UTC);
+	}
 }

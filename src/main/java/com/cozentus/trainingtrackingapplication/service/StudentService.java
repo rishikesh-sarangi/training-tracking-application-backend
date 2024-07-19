@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.model.Student;
@@ -13,8 +12,11 @@ import com.cozentus.trainingtrackingapplication.repository.StudentRepository;
 @Service
 public class StudentService {
 
-	@Autowired
 	private StudentRepository studentRepository;
+
+	StudentService(StudentRepository studentRepository) {
+		this.studentRepository = studentRepository;
+	}
 
 	public List<Student> getAllStudents() {
 		return studentRepository.findAll();
@@ -46,8 +48,8 @@ public class StudentService {
 		}
 		return false;
 	}
-	
+
 	public Set<Student> getStudentsByBatchAndProgram(Integer batchId, Integer programId) {
-        return studentRepository.findStudentsByBatchIdAndProgramId(batchId, programId);
-    }
+		return studentRepository.findStudentsByBatchIdAndProgramId(batchId, programId);
+	}
 }

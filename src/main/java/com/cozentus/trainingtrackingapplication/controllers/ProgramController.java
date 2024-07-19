@@ -2,8 +2,6 @@ package com.cozentus.trainingtrackingapplication.controllers;
 
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -24,9 +22,12 @@ import com.cozentus.trainingtrackingapplication.service.ProgramService;
 @RequestMapping("/programs")
 public class ProgramController {
 
-	@Autowired
 	private ProgramService programService;
-	
+
+	ProgramController(ProgramService programService) {
+
+		this.programService = programService;
+	}
 
 	@GetMapping
 	public ResponseEntity<List<Program>> getAllPrograms() {
@@ -37,35 +38,32 @@ public class ProgramController {
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
-	
+
 	@PostMapping
 	public ResponseEntity<Program> createProgram(@RequestBody Program program) {
-		Optional<Program> createdProgram = Optional.ofNullable
-				(programService.addProgram(program));
-		if(createdProgram.isPresent()) {
+		Optional<Program> createdProgram = Optional.ofNullable(programService.addProgram(program));
+		if (createdProgram.isPresent()) {
 			return new ResponseEntity<>(createdProgram.get(), HttpStatus.CREATED);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
-	
+
 	@PutMapping("/{programId}")
-	public ResponseEntity<Program> 
-	updateProgram(@PathVariable Integer programId ,@RequestBody Program program) {
-		Optional<Program> updatedProgram = Optional.ofNullable
-				(programService.editProgram(programId, program));
-		if(updatedProgram.isPresent()) {
+	public ResponseEntity<Program> updateProgram(@PathVariable Integer programId, @RequestBody Program program) {
+		Optional<Program> updatedProgram = Optional.ofNullable(programService.editProgram(programId, program));
+		if (updatedProgram.isPresent()) {
 			return new ResponseEntity<>(updatedProgram.get(), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
-	
+
 	@DeleteMapping("/{programId}")
 	public ResponseEntity<Boolean> deleteProgram(@PathVariable Integer programId) {
 		Optional<Boolean> deletedProgram = Optional.of(programService.deleteProgram(programId));
-		if(deletedProgram.isPresent()) {
+		if (deletedProgram.isPresent()) {
 			return new ResponseEntity<>(deletedProgram.get(), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
-	
+
 }

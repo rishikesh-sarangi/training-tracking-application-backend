@@ -3,7 +3,6 @@ package com.cozentus.trainingtrackingapplication.controllers;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,11 +26,15 @@ import com.cozentus.trainingtrackingapplication.service.TeacherService;
 @RequestMapping("/teachers")
 public class TeacherController {
 
-	@Autowired
 	private TeacherService teacherService;
 
-	@Autowired
 	private EmailService emailService;
+
+	TeacherController(TeacherService teacherService, EmailService emailService) {
+
+		this.teacherService = teacherService;
+		this.emailService = emailService;
+	}
 
 	@GetMapping
 	public ResponseEntity<List<Teacher>> getAllCourses() {
@@ -78,13 +81,15 @@ public class TeacherController {
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
-	
-    @GetMapping("/{teacherId}/batch-program-course-info")
-    public ResponseEntity<List<TeacherBatchProgramCourseDTO>> getBatchProgramCourseInfo(@PathVariable Integer teacherId) {    	
-    	Optional<List<TeacherBatchProgramCourseDTO>> info = Optional.ofNullable(teacherService.getBatchProgramCourseInfoByTeacherId(teacherId));
+
+	@GetMapping("/{teacherId}/batch-program-course-info")
+	public ResponseEntity<List<TeacherBatchProgramCourseDTO>> getBatchProgramCourseInfo(
+			@PathVariable Integer teacherId) {
+		Optional<List<TeacherBatchProgramCourseDTO>> info = Optional
+				.ofNullable(teacherService.getBatchProgramCourseInfoByTeacherId(teacherId));
 		if (info.isPresent()) {
 			return new ResponseEntity<>(info.get(), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    }
+	}
 }

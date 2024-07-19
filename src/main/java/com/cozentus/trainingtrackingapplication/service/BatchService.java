@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseTeacherDeleteDTO;
@@ -31,17 +30,21 @@ import jakarta.transaction.Transactional;
 @Service
 public class BatchService {
 
-	@Autowired
 	private BatchRepository batchRepository;
 
-	@Autowired
 	private StudentRepository studentRepository;
 
-	@Autowired
 	private ProgramRepository programRepository;
 
-	@Autowired
 	private CourseRepository courseRepository;
+
+	public BatchService(BatchRepository batchRepository, StudentRepository studentRepository,
+			ProgramRepository programRepository, CourseRepository courseRepository) {
+		this.batchRepository = batchRepository;
+		this.studentRepository = studentRepository;
+		this.programRepository = programRepository;
+		this.courseRepository = courseRepository;
+	}
 
 	public Batch addBatch(Batch batch) {
 		return batchRepository.save(batch);
@@ -84,29 +87,29 @@ public class BatchService {
 
 	@Transactional
 	public List<CourseWithTeachersDTO> getCoursesAndTeachersByBatchAndProgram(Integer batchId, Integer programId) {
-	    List<Object[]> courseData = batchRepository.findCoursesByBatchIdAndProgramId(batchId, programId);
-	    if (courseData.isEmpty()) {
-	        throw new EntityNotFoundException(
-	                "No courses found for batch id: " + batchId + " and program id: " + programId);
-	    }
-	    
-	    List<Course> courses = courseData.stream().map(this::mapToCourse).toList();
-	    
-	    List<Integer> courseIds = courses.stream().map(Course::getCourseId).toList();
-	    Map<Integer, Set<Teacher>> teachersByCourseId = fetchTeachersForCourses(courseIds);
-	    
-	    return convertToCourseDTOList(courses, teachersByCourseId);
+		List<Object[]> courseData = batchRepository.findCoursesByBatchIdAndProgramId(batchId, programId);
+		if (courseData.isEmpty()) {
+			throw new EntityNotFoundException(
+					"No courses found for batch id: " + batchId + " and program id: " + programId);
+		}
+
+		List<Course> courses = courseData.stream().map(this::mapToCourse).toList();
+
+		List<Integer> courseIds = courses.stream().map(Course::getCourseId).toList();
+		Map<Integer, Set<Teacher>> teachersByCourseId = fetchTeachersForCourses(courseIds);
+
+		return convertToCourseDTOList(courses, teachersByCourseId);
 	}
 
 	private Course mapToCourse(Object[] data) {
-	    Course course = new Course();
-	    course.setCourseId((Integer) data[0]);
-	    course.setCourseName((String) data[1]);
-	    course.setCode((String) data[2]);
-	    course.setDescription((String) data[3]);
-	    course.setTheoryTime((Integer) data[4]);
-	    course.setPracticeTime((Integer) data[5]);
-	    return course;
+		Course course = new Course();
+		course.setCourseId((Integer) data[0]);
+		course.setCourseName((String) data[1]);
+		course.setCode((String) data[2]);
+		course.setDescription((String) data[3]);
+		course.setTheoryTime((Integer) data[4]);
+		course.setPracticeTime((Integer) data[5]);
+		return course;
 	}
 
 	private Map<Integer, Set<Teacher>> fetchTeachersForCourses(List<Integer> courseIds) {
@@ -132,12 +135,12 @@ public class BatchService {
 	}
 
 	private CourseWithTeachersDTO convertToCourseDTO(Course course, Set<Teacher> teachers) {
-	    CourseWithTeachersDTO dto = new CourseWithTeachersDTO();
-	    dto.setCourseId(course.getCourseId());
-	    dto.setCourseName(course.getCourseName());
-	    dto.setCourseCode(course.getCode());
-	    dto.setTeachers(convertToTeacherDTOList(teachers));
-	    return dto;
+		CourseWithTeachersDTO dto = new CourseWithTeachersDTO();
+		dto.setCourseId(course.getCourseId());
+		dto.setCourseName(course.getCourseName());
+		dto.setCourseCode(course.getCode());
+		dto.setTeachers(convertToTeacherDTOList(teachers));
+		return dto;
 	}
 
 	public Boolean deleteBatchProgramCourseTeacherByBatchId(Integer batchId) {
@@ -217,7 +220,6 @@ public class BatchService {
 		dto.setStudentCode(student.getStudentCode());
 		return dto;
 	}
-
 
 	private List<TeacherDTO> convertToTeacherDTOList(Set<Teacher> teachers) {
 		return teachers.stream().map(this::convertToTeacherDTO).toList();

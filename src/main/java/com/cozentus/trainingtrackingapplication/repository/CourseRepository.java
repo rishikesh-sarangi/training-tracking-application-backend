@@ -16,17 +16,13 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 			+ "INNER JOIN Teacher t ON tc.teacher_id = t.teacher_id "
 			+ "WHERE c.course_id IN :courseIds", nativeQuery = true)
 	List<Object[]> findTeachersByCourseIds(@Param("courseIds") List<Integer> courseIds);
-	
-	  
-	  @Query(value = "SELECT DISTINCT c.course_id, c.course_name, c.code, c.description, c.theory_time, c.practice_time " +
-		       "FROM batch_program_course_teacher bpct " +
-		       "INNER JOIN Course c ON bpct.course_id = c.course_id " +
-		       "WHERE bpct.batch_id = :batchId " +
-		       "AND bpct.program_id = :programId " +
-		       "AND bpct.teacher_id = :teacherId", 
-		       nativeQuery = true)
-		List<Object[]> findCoursesByBatchProgramAndTeacher(
-		       @Param("batchId") Integer batchId,
-		       @Param("programId") Integer programId,
-		       @Param("teacherId") Integer teacherId);
+
+	@Query(value = "SELECT DISTINCT c.course_id, c.course_name, c.code, c.description, c.theory_time, c.practice_time, "
+			+ "t.topic_id, t.topic_name, t.topic_order, t.theory_time, t.practice_time "
+			+ "FROM batch_program_course_teacher bpct " + "INNER JOIN Course c ON bpct.course_id = c.course_id "
+			+ "LEFT JOIN Topic t ON c.course_id = t.course_id " + "WHERE bpct.batch_id = :batchId "
+			+ "AND bpct.program_id = :programId " + "AND bpct.teacher_id = :teacherId "
+			+ "ORDER BY c.course_id, t.topic_order", nativeQuery = true)
+	List<Object[]> findCoursesWithTopicsByBatchProgramAndTeacher(@Param("batchId") Integer batchId,
+			@Param("programId") Integer programId, @Param("teacherId") Integer teacherId);
 }

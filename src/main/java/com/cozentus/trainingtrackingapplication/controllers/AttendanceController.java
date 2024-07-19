@@ -3,7 +3,6 @@ package com.cozentus.trainingtrackingapplication.controllers;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -27,14 +26,21 @@ import com.cozentus.trainingtrackingapplication.util.ResponseUtil;
 @RequestMapping("/attendance")
 public class AttendanceController {
 
-	@Autowired
 	private AttendanceService attendanceService;
+
+	AttendanceController(AttendanceService attendanceService) {
+		this.attendanceService = attendanceService;
+	}
 
 	@PostMapping
 	public ResponseEntity<Object> createEvaluation(@RequestBody Attendance attendance) {
 		try {
 			Attendance createdAttendance = attendanceService.addAttendance(attendance);
-			return ResponseUtil.buildSuccessResponse(Collections.singletonList(createdAttendance));
+			if (createdAttendance != null) {
+				return ResponseUtil.buildSuccessResponse(Collections.singletonList(createdAttendance));
+			} else {
+				return ResponseUtil.buildErrorResponse("Error creating attendance entry", HttpStatus.BAD_REQUEST);
+			}
 		} catch (Exception e) {
 			return ResponseUtil.buildErrorResponse("Error creating attendance entry: " + e.getMessage(),
 					HttpStatus.INTERNAL_SERVER_ERROR);
@@ -44,10 +50,14 @@ public class AttendanceController {
 	@GetMapping
 	public ResponseEntity<Object> getAllAttendances() {
 		try {
-			return ResponseUtil.buildSuccessResponse(attendanceService.getAllAttendances());
+			List<Attendance> attendances = attendanceService.getAllAttendances();
+			if (!attendances.isEmpty()) {
+				return ResponseUtil.buildSuccessResponse(attendances);
+			} else {
+				return ResponseUtil.buildErrorResponse("No attendances found", HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error fetching attendances: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
 
@@ -56,23 +66,29 @@ public class AttendanceController {
 	public ResponseEntity<Object> getAttendancesByFilters(@RequestBody AttendanceDTO filterDTO) {
 		try {
 			List<Attendance> attendances = attendanceService.getAttendanceByTeacherBatchProgramAndCourse(
-					filterDTO.getTeacherId(), filterDTO.getBatchId(), filterDTO.getProgramId(),
-					filterDTO.getCourseId(), filterDTO.getAttendanceDate());
-			return ResponseUtil.buildSuccessResponse(attendances);
+					filterDTO.getTeacherId(), filterDTO.getBatchId(), filterDTO.getProgramId(), filterDTO.getCourseId(),
+					filterDTO.getAttendanceDate());
+			if (!attendances.isEmpty()) {
+				return ResponseUtil.buildSuccessResponse(attendances);
+			} else {
+				return ResponseUtil.buildErrorResponse("Error fetching attendances:", HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error fetching attendances: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
 
 	@DeleteMapping("/{attendanceId}")
 	public ResponseEntity<Object> deleteAllAttendances(@PathVariable Integer attendanceId) {
 		try {
-			attendanceService.deleteAttendance(attendanceId);
-			return ResponseUtil.buildSuccessResponse(Collections.emptyList());
+			Boolean response = attendanceService.deleteAttendance(attendanceId);
+			if (response.equals(true)) {
+				return ResponseUtil.buildSuccessResponse(Collections.emptyList());
+			} else {
+				return ResponseUtil.buildErrorResponse("Attendance not found", HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error deleting attendances: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
 
@@ -81,23 +97,28 @@ public class AttendanceController {
 			@RequestBody AttendanceEditDTO attendanceEditDTO) {
 		try {
 			Attendance updatedAttendance = attendanceService.editAttendance(attendanceId, attendanceEditDTO);
-			return ResponseUtil.buildSuccessResponse(Collections.singletonList(updatedAttendance));
+			if (updatedAttendance != null) {
+				return ResponseUtil.buildSuccessResponse(Collections.singletonList(updatedAttendance));
+			} else {
+				return ResponseUtil.buildErrorResponse("Attendance not found", HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error updating attendance: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
-	
-	
+
 //	this is a get request i'm using post mapping for filtering
 	@PostMapping("/by-batch-program-teacher")
 	public ResponseEntity<Object> getAttendanceByTeacherBatchProgramAndCourse(@RequestBody AttendanceDTO filterDTO) {
 		try {
 			List<Attendance> attendances = attendanceService.findByBatchIdAndProgramIdAndTeacherId(filterDTO);
-			return ResponseUtil.buildSuccessResponse(attendances);
+			if (!attendances.isEmpty()) {
+				return ResponseUtil.buildSuccessResponse(attendances);
+			} else {
+				return ResponseUtil.buildErrorResponse("Error fetching attendances:", HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error fetching attendances: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
 }

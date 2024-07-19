@@ -36,10 +36,13 @@ public class EvaluationController {
 	public ResponseEntity<Object> getAllEvaluations() {
 		try {
 			List<Evaluation> evaluations = evaluationService.getAllEvaluations();
-			return ResponseUtil.buildSuccessResponse(evaluations);
+			if (!evaluations.isEmpty()) {
+				return ResponseUtil.buildSuccessResponse(evaluations);
+			} else {
+				return ResponseUtil.buildErrorResponse("No evaluations found", HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error fetching evaluations: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
 
@@ -47,10 +50,13 @@ public class EvaluationController {
 	public ResponseEntity<Object> createEvaluation(@RequestBody Evaluation evaluation) {
 		try {
 			Evaluation createdEvaluation = evaluationService.saveEvaluation(evaluation);
-			return ResponseUtil.buildSuccessResponse(Collections.singletonList(createdEvaluation));
+			if (createdEvaluation != null) {
+				return ResponseUtil.buildSuccessResponse(Collections.singletonList(createdEvaluation));
+			} else {
+				return ResponseUtil.buildErrorResponse("Error creating evaluation", HttpStatus.BAD_REQUEST);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error creating evaluation: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
 
@@ -61,21 +67,29 @@ public class EvaluationController {
 			List<Evaluation> evaluations = evaluationService.getEvaluationsByTeacherBatchProgramAndCourse(
 					filterDTO.getTeacherId(), filterDTO.getBatchId(), filterDTO.getProgramId(),
 					filterDTO.getCourseId());
-			return ResponseUtil.buildSuccessResponse(evaluations);
+
+			if (!evaluations.isEmpty()) {
+				return ResponseUtil.buildSuccessResponse(evaluations);
+			} else {
+				return ResponseUtil.buildErrorResponse("Error fetching evaluations:", HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error fetching evaluations: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
 
 	@DeleteMapping("/{evaluationId}")
 	public ResponseEntity<Object> deleteAllEvaluations(@PathVariable Integer evaluationId) {
 		try {
-			evaluationService.deleteEvaluation(evaluationId);
-			return ResponseUtil.buildSuccessResponse(Collections.emptyList());
+			Boolean response = evaluationService.deleteEvaluation(evaluationId);
+
+			if (response.equals(true)) {
+				return ResponseUtil.buildSuccessResponse(Collections.emptyList());
+			} else {
+				return ResponseUtil.buildErrorResponse("Evaluation not found", HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error deleting evaluations: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
 
@@ -84,10 +98,13 @@ public class EvaluationController {
 			@RequestBody EvaluationDTO evaluation) {
 		try {
 			Evaluation updatedEvaluation = evaluationService.editEvaluation(evaluationId, evaluation);
-			return ResponseUtil.buildSuccessResponse(Collections.singletonList(updatedEvaluation));
+			if (updatedEvaluation != null) {
+				return ResponseUtil.buildSuccessResponse(Collections.singletonList(updatedEvaluation));
+			} else {
+				return ResponseUtil.buildErrorResponse("Evaluation not found", HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error updating evaluation: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
 }

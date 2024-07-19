@@ -3,7 +3,6 @@ package com.cozentus.trainingtrackingapplication.controllers;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -28,66 +27,71 @@ import jakarta.transaction.Transactional;
 @RequestMapping("/batches")
 public class BatchController {
 
-	@Autowired
-	private BatchService batchService;
+	private final BatchService batchService;
+
+	BatchController(BatchService batchService) {
+		this.batchService = batchService;
+	}
 
 	@GetMapping
-	public ResponseEntity<List<Batch>> getAllCourses() {
+	public ResponseEntity<List<Batch>> getAllBatches() {
 		Optional<List<Batch>> batches = Optional.ofNullable(batchService.getAllBatches());
-		if (batches.isPresent()) {
-			return new ResponseEntity<>(batches.get(), HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		return batches.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	@PostMapping
-	public ResponseEntity<Batch> createCourse(@RequestBody Batch batch) {
+	public ResponseEntity<Batch> createBatch(@RequestBody Batch batch) {
 		Optional<Batch> createdBatch = Optional.ofNullable(batchService.addBatch(batch));
-		if (createdBatch.isPresent()) {
-			return new ResponseEntity<>(createdBatch.get(), HttpStatus.CREATED);
-		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		return createdBatch.map(value -> new ResponseEntity<>(value, HttpStatus.CREATED))
+				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
 	@PutMapping("/{batchId}")
 	public ResponseEntity<Batch> updateBatch(@PathVariable Integer batchId, @RequestBody Batch batch) {
 		Optional<Batch> updatedBatch = Optional.ofNullable(batchService.editBatch(batchId, batch));
-		if (updatedBatch.isPresent()) {
-			return new ResponseEntity<>(updatedBatch.get(), HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		return updatedBatch.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
-//	delete the batch itself
 	@Transactional
 	@DeleteMapping("/{batchId}")
 	public ResponseEntity<Boolean> deleteBatch(@PathVariable Integer batchId) {
-		batchService.deleteBatchProgramCourseTeacherByBatchId(batchId);
-		batchService.deleteBatch(batchId);
-		return new ResponseEntity<>(true, HttpStatus.OK);
+		try {
+			batchService.deleteBatchProgramCourseTeacherByBatchId(batchId);
+			batchService.deleteBatch(batchId);
+			return new ResponseEntity<>(true, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+		}
+
 	}
 
-//	delete the program associated with that particular batch
 	@Transactional
 	@DeleteMapping("/{batchId}/programs/{programId}")
 	public ResponseEntity<Boolean> deleteProgram(@PathVariable Integer batchId, @PathVariable Integer programId) {
-		batchService.deleteProgramAndStudentsForBatch(programId, batchId);
-		return new ResponseEntity<>(true, HttpStatus.OK);
+		try {
+			batchService.deleteProgramAndStudentsForBatch(programId, batchId);
+			return new ResponseEntity<>(true, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
+		}
 	}
 
-//	get the programs and associated students under a certain batch
 	@GetMapping("/{batchId}/programs-and-students")
 	public ResponseEntity<List<ProgramDTO>> getProgramsWithStudentsByBatchId(@PathVariable Integer batchId) {
-		List<ProgramDTO> programsInfo = batchService.getProgramsWithStudentsByBatchId(batchId);
-		return ResponseEntity.ok(programsInfo);
+		Optional<List<ProgramDTO>> programsInfo = Optional
+				.ofNullable(batchService.getProgramsWithStudentsByBatchId(batchId));
+		return programsInfo.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
 
-//	get the courses under the program in a batch
 	@GetMapping("/{batchId}/program/{programId}/courses-teachers")
 	public ResponseEntity<List<CourseWithTeachersDTO>> getCoursesAndTeachersByBatchAndProgram(
 			@PathVariable Integer batchId, @PathVariable Integer programId) {
-		List<CourseWithTeachersDTO> courses = batchService.getCoursesAndTeachersByBatchAndProgram(batchId, programId);
-		return ResponseEntity.ok(courses);
+		Optional<List<CourseWithTeachersDTO>> courses = Optional
+				.ofNullable(batchService.getCoursesAndTeachersByBatchAndProgram(batchId, programId));
+		return courses.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
 	}
-
 }

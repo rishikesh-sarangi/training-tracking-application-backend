@@ -1,11 +1,10 @@
 package com.cozentus.trainingtrackingapplication.model;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -19,18 +18,16 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Entity
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
+@Entity
 @Table(name = "Student")
 public class Student {
 	@Id
@@ -50,13 +47,10 @@ public class Student {
 	@Column(name = "student_code")
 	private String studentCode;
 	
-
-	@CreationTimestamp
 	@Column(name = "created_date", updatable = false)
 	@JsonIgnore
 	private LocalDate createdDate;
 
-	@UpdateTimestamp
 	@Column(name = "updated_date")
 	@JsonIgnore
 	private LocalDate updatedDate;
@@ -86,4 +80,15 @@ public class Student {
 	@JsonIgnore
 	@OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<EvaluationStudent> evaluationStudents;
+	
+	@PrePersist
+	protected void onCreate() {
+		createdDate = LocalDate.now(ZoneOffset.UTC);
+		updatedDate = LocalDate.now(ZoneOffset.UTC);
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		updatedDate = LocalDate.now(ZoneOffset.UTC);
+	}
 }

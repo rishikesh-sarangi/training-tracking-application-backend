@@ -1,6 +1,5 @@
 package com.cozentus.trainingtrackingapplication.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,21 +12,24 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cozentus.trainingtrackingapplication.dto.EnrollmentDTO;
 import com.cozentus.trainingtrackingapplication.service.EnrollmentService;
 
-
 @RestController
 @CrossOrigin("http://localhost:4200/")
 @RequestMapping("/enrollments")
 public class EnrollmentController {
-    @Autowired
-    private EnrollmentService enrollmentService;
 
-    @PostMapping
-    public ResponseEntity<Boolean> enrollStudents(@RequestBody EnrollmentDTO enrollmentDTO) {
-        enrollmentService.enrollStudents(enrollmentDTO);
-        return new ResponseEntity<>(true, HttpStatus.OK);
-    }
-    
-    @PutMapping
+	private EnrollmentService enrollmentService;
+
+	EnrollmentController(EnrollmentService enrollmentService) {
+		this.enrollmentService = enrollmentService;
+	}
+
+	@PostMapping
+	public ResponseEntity<Boolean> enrollStudents(@RequestBody EnrollmentDTO enrollmentDTO) {
+		enrollmentService.enrollStudents(enrollmentDTO);
+		return new ResponseEntity<>(true, HttpStatus.OK);
+	}
+
+	@PutMapping
 	public ResponseEntity<Boolean> updateEnrollment(@RequestBody EnrollmentDTO enrollmentUpdateDTO) {
 		enrollmentService.updateEnrollment(enrollmentUpdateDTO);
 		return new ResponseEntity<>(true, HttpStatus.OK);

@@ -1,125 +1,57 @@
 package com.cozentus.trainingtrackingapplication.util;
 
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.cozentus.trainingtrackingapplication.response.ApiResponse;
 
 public class ResponseUtil {
 
-    // Response status constants
-    public static final String STATUS_SUCCESS = "SUCCESS";
-    public static final String STATUS_ERROR = "ERROR";
-
-    // Message type constants
-    public static final String MESSAGE_TYPE_INFO = "INFO";
-    public static final String MESSAGE_TYPE_WARNING = "WARNING";
-    public static final String MESSAGE_TYPE_ERROR = "ERROR";
-
     /**
-     * Processes the request based on the given type.
-     * @param type The type of request to process
-     * @return ResponseEntity containing the appropriate response
-     */
-    public static ResponseEntity<Object> processRequest(String type) {
-        if (type == null) {
-            return buildErrorResponse("Type parameter is required", HttpStatus.BAD_REQUEST);
-        }
-
-        switch (type.toLowerCase()) {
-            case "success":
-                return buildSuccessResponse(createSuccessData());
-            case "custom":
-                return buildCustomResponse(
-                        STATUS_SUCCESS,
-                        "This is a custom response",
-                        createCustomData(),
-                        HttpStatus.OK
-                );
-            default:
-                return buildErrorResponse("Invalid type specified", HttpStatus.BAD_REQUEST);
-        }
-    }
-
-    /**
-     * Creates data for a success response.
-     * @return List containing success data
-     */
-    private static List<Map<String, String>> createSuccessData() {
-        List<Map<String, String>> dataList = new ArrayList<>();
-        Map<String, String> data = new HashMap<>();
-        data.put("message", "This is a success response");
-        dataList.add(data);
-        return dataList;
-    }
-
-    /**
-     * Creates data for a custom response.
-     * @return List containing custom data
-     */
-    private static List<Map<String, String>> createCustomData() {
-        List<Map<String, String>> dataList = new ArrayList<>();
-        Map<String, String> data = new HashMap<>();
-        data.put("customField", "Custom value");
-        dataList.add(data);
-        return dataList;
-    }
-
-    /**
-     * Builds a success response.
-     * @param data The data to include in the response
-     * @return ResponseEntity with success status and data
+     * Builds a success response with HTTP status OK.
+     * @param data The data to include in the response body
+     * @param <T> The type of the data
+     * @return ResponseEntity containing success response with data
      */
     public static <T> ResponseEntity<Object> buildSuccessResponse(List<T> data) {
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("statusCode", HttpStatus.OK.value());
-        responseBody.put("statusMessage", STATUS_SUCCESS);
-        responseBody.put("data", data);
-
-        List<Map<String, Object>> response = new ArrayList<>();
-        response.add(responseBody);
-
+        ApiResponse<List<T>> response = new ApiResponse<>(HttpStatus.OK.value(), "Success", data);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     /**
-     * Builds an error response.
+     * Builds an error response with a specific message and HTTP status.
      * @param message The error message
-     * @param status The HTTP status code
-     * @return ResponseEntity with error status and message
+     * @param httpStatus The HTTP status code
+     * @param <T> The type of data in the response (typically Void for error responses)
+     * @return ResponseEntity containing error response with message
      */
-    public static ResponseEntity<Object> buildErrorResponse(String message, HttpStatus status) {
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("statusCode", status.value());
-        responseBody.put("statusMessage", message);
-        responseBody.put("data", new ArrayList<>());
-
-        List<Map<String, Object>> response = new ArrayList<>();
-        response.add(responseBody);
-
-        return new ResponseEntity<>(response, status);
+    public static <T> ResponseEntity<Object> buildErrorResponse(String message, HttpStatus httpStatus) {
+        ApiResponse<T> response = new ApiResponse<>(httpStatus.value(), message, null);
+        return new ResponseEntity<>(response, httpStatus);
     }
 
     /**
-     * Builds a custom response.
-     * @param status The response status
-     * @param message The response message
-     * @param data The data to include in the response
+     * Generates a custom response with specified HTTP status, data, and message.
      * @param httpStatus The HTTP status code
-     * @return ResponseEntity with custom fields and HTTP status
+     * @param data The data to include in the response body
+     * @param message The message associated with the response
+     * @param <T> The type of the data
+     * @return ResponseEntity containing custom response with data and message
      */
-    public static <T> ResponseEntity<Object> buildCustomResponse(String status, String message, List<T> data, HttpStatus httpStatus) {
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("statusCode", httpStatus.value());
-        responseBody.put("statusMessage", message);
-        responseBody.put("data", data);
-
-        List<Map<String, Object>> response = new ArrayList<>();
-        response.add(responseBody);
-
+    public static <T> ResponseEntity<Object> generateResponse(HttpStatus httpStatus, List<T> data, String message) {
+        ApiResponse<List<T>> response = new ApiResponse<>(httpStatus.value(), message, data);
         return new ResponseEntity<>(response, httpStatus);
+    }
+
+    /**
+     * Builds a generic error response with HTTP status INTERNAL_SERVER_ERROR.
+     * @return ResponseEntity containing generic error response
+     */
+    public static ResponseEntity<Object> buildGenericErrorResponse() {
+        ApiResponse<Void> response = new ApiResponse<>(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Something went wrong. Please try again later.", null);
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

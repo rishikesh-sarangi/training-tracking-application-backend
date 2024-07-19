@@ -1,20 +1,17 @@
 package com.cozentus.trainingtrackingapplication.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "Attendance")
 public class Attendance {
@@ -23,33 +20,41 @@ public class Attendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "attendance_id")
     private Integer attendanceId;
-
+    
+    @NotNull
     @Column(name = "attendance_date")
     private LocalDate attendanceDate;
-
+    
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "batch_id")
     private Batch batch;
-
+    
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "program_id")
     private Program program;
-
+    
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "course_id")
     private Course course;
-
+    
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
-
+    
+    @NotNull
     @ManyToOne
     @JoinColumn(name = "topic_id")
     private Topic topic;
-
+    
+    @NotNull
     @Column(name = "topic_name")
     private String topicName;
-
+    
+    @NotNull
     @Column(name = "topic_percentage_completed")
     private Double topicPercentageCompleted;
     

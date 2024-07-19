@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.dto.TeacherBatchProgramCourseDTO;
@@ -20,17 +19,22 @@ import jakarta.persistence.EntityNotFoundException;
 @Service
 public class TeacherService {
 
-	@Autowired
 	private TeacherRepository teacherRepository;
 
-	@Autowired
 	private CourseRepository courseRepository;
 
-	@Autowired
 	private MyUserService myUserService;
 
-	@Autowired
 	private BatchRepository batchRepository;
+
+	TeacherService(TeacherRepository teacherRepository, CourseRepository courseRepository, MyUserService myUserService,
+			BatchRepository batchRepository) {
+
+		this.teacherRepository = teacherRepository;
+		this.courseRepository = courseRepository;
+		this.myUserService = myUserService;
+		this.batchRepository = batchRepository;
+	}
 
 	public List<Teacher> getAllTeachers() {
 		return teacherRepository.findAll();
@@ -77,8 +81,8 @@ public class TeacherService {
 	public Integer getTeacherId(String teacherEmail) {
 		return teacherRepository.findTeacherIdByTeacherEmail(teacherEmail);
 	}
-	
+
 	public List<TeacherBatchProgramCourseDTO> getBatchProgramCourseInfoByTeacherId(Integer teacherId) {
-        return teacherRepository.findBatchProgramCourseInfoByTeacherId(teacherId);
-    }
+		return teacherRepository.findBatchProgramCourseInfoByTeacherId(teacherId);
+	}
 }

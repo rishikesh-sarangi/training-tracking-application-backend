@@ -3,7 +3,6 @@ package com.cozentus.trainingtrackingapplication.controllers;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseDTO;
+import com.cozentus.trainingtrackingapplication.dto.CoursesWithTopicsDTO;
 import com.cozentus.trainingtrackingapplication.model.Course;
 import com.cozentus.trainingtrackingapplication.service.CourseService;
 import com.cozentus.trainingtrackingapplication.util.ResponseUtil;
@@ -26,8 +26,11 @@ import com.cozentus.trainingtrackingapplication.util.ResponseUtil;
 @RequestMapping("/courses")
 public class CourseController {
 
-	@Autowired
 	private CourseService courseService;
+
+	CourseController(CourseService courseService) {
+		this.courseService = courseService;
+	}
 
 	@GetMapping()
 	public ResponseEntity<List<Course>> getAllCourses() {
@@ -69,7 +72,8 @@ public class CourseController {
 	public ResponseEntity<Object> getCoursesByBatchProgramAndTeacher(
 			@RequestBody BatchProgramCourseDTO batchProgramCourseDTO) {
 		try {
-			List<Course> courses = courseService.getCoursesByBatchProgramAndTeacher(batchProgramCourseDTO);
+			List<CoursesWithTopicsDTO> courses = courseService
+					.getCoursesWithTopicsByBatchProgramAndTeacher(batchProgramCourseDTO);
 			return ResponseUtil.buildSuccessResponse(courses);
 		} catch (Exception e) {
 			return ResponseUtil.buildErrorResponse("Error fetching evaluations: " + e.getMessage(),

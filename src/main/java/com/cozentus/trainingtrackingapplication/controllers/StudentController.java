@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -26,11 +25,15 @@ import com.cozentus.trainingtrackingapplication.service.StudentService;
 @RequestMapping("/students")
 public class StudentController {
 
-	@Autowired
 	private StudentService studentService;
 
-	@Autowired
 	private EmailService emailService;
+
+	StudentController(StudentService studentService, EmailService emailService) {
+
+		this.studentService = studentService;
+		this.emailService = emailService;
+	}
 
 	@GetMapping
 	public ResponseEntity<List<Student>> getAllStudents() {
@@ -41,7 +44,6 @@ public class StudentController {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	
 //	need to check if the email is in DB first or not
 	@PostMapping
 	public ResponseEntity<Student> createStudent(@RequestBody Student student) {
@@ -71,28 +73,27 @@ public class StudentController {
 	@DeleteMapping("/{studentId}")
 	public ResponseEntity<Boolean> deleteStudent(@PathVariable Integer studentId) {
 		Optional<Boolean> deletedStudent = Optional.ofNullable(studentService.deleteStudent(studentId));
-		if (deletedStudent.isPresent()) {
+		if (deletedStudent.get().equals(true)) {
 			return new ResponseEntity<>(deletedStudent.get(), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
-	
+
 //	get the associated students under a certain program which is under a certain batch
-    @GetMapping("/{batchId}/{programId}")
-    public ResponseEntity<Set<Student>> getStudentsByBatchAndProgram(
-            @PathVariable Integer batchId,
-            @PathVariable Integer programId) {
-        Set<Student> students = studentService.getStudentsByBatchAndProgram(batchId, programId);
-        return ResponseEntity.ok(students);
-    }
+	@GetMapping("/{batchId}/{programId}")
+	public ResponseEntity<Set<Student>> getStudentsByBatchAndProgram(@PathVariable Integer batchId,
+			@PathVariable Integer programId) {
+		Set<Student> students = studentService.getStudentsByBatchAndProgram(batchId, programId);
+		return ResponseEntity.ok(students);
+	}
 
 	private ResponseEntity<Student> editStudent(Integer studentId, Student student) {
 		Optional<Student> updatedStudent = Optional.ofNullable(studentService.editStudent(studentId, student));
 		return updatedStudent.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
 	}
-	
+
 	private ResponseEntity<Student> saveStudent(Student student) {
-	    Student createdStudent = studentService.addStudent(student);
-	    return ResponseEntity.status(HttpStatus.CREATED).body(createdStudent);
+		Student createdStudent = studentService.addStudent(student);
+		return ResponseEntity.status(HttpStatus.CREATED).body(createdStudent);
 	}
 }

@@ -1,13 +1,16 @@
 package com.cozentus.trainingtrackingapplication.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseDTO;
+import com.cozentus.trainingtrackingapplication.dto.CoursesWithTopicsDTO;
+import com.cozentus.trainingtrackingapplication.dto.TopicDTO;
 import com.cozentus.trainingtrackingapplication.model.Course;
 import com.cozentus.trainingtrackingapplication.model.Program;
 import com.cozentus.trainingtrackingapplication.model.Teacher;
@@ -21,20 +24,24 @@ import jakarta.transaction.Transactional;
 @Service
 public class CourseService {
 
-	@Autowired
 	private CourseRepository courseRepository;
 
-	@Autowired
 	private ProgramRepository programRepository;
 
-	@Autowired
 	private TeacherRepository teacherRepository;
 
-	@Autowired
 	private BatchRepository batchRepository;
 
-	@Autowired
 	private ProgramService programService;
+
+	CourseService(CourseRepository courseRepository, ProgramRepository programRepository,
+			TeacherRepository teacherRepository, BatchRepository batchRepository, ProgramService programService) {
+		this.courseRepository = courseRepository;
+		this.programRepository = programRepository;
+		this.teacherRepository = teacherRepository;
+		this.batchRepository = batchRepository;
+		this.programService = programService;
+	}
 
 	public Course addCourse(Course course) {
 		return courseRepository.save(course);
@@ -90,22 +97,26 @@ public class CourseService {
 		return null;
 	}
 
-	public List<Course> getCoursesByBatchProgramAndTeacher(BatchProgramCourseDTO batchProgramCourseDTO) {
+	public List<CoursesWithTopicsDTO> getCoursesWithTopicsByBatchProgramAndTeacher(
+			BatchProgramCourseDTO batchProgramCourseDTO) {
 		Integer batchId = batchProgramCourseDTO.getBatchId();
 		Integer programId = batchProgramCourseDTO.getProgramId();
 		Integer teacherId = batchProgramCourseDTO.getTeacherId();
-        List<Object[]> results = courseRepository.findCoursesByBatchProgramAndTeacher(batchId, programId, teacherId);
-        return results.stream().map(this::mapToCourse).collect(Collectors.toList());
-    }
+		List<Object[]> results = courseRepository.findCoursesWithTopicsByBatchProgramAndTeacher(batchId, programId,
+				teacherId);
+		Map<Integer, CoursesWithTopicsDTO> courseMap = new HashMap<>();
 
-    private Course mapToCourse(Object[] row) {
-        Course course = new Course();
-        course.setCourseId((Integer) row[0]);
-        course.setCourseName((String) row[1]);
-        course.setCode((String) row[2]);
-        course.setDescription((String) row[3]);
-        course.setTheoryTime((Integer) row[4]);
-        course.setPracticeTime((Integer) row[5]);
-        return course;
-    }
+		for (Object[] row : results) {
+			Integer courseId = (Integer) row[0];
+			CoursesWithTopicsDTO course = courseMap.computeIfAbsent(courseId,
+					id -> new CoursesWithTopicsDTO(id, (String) row[1], (String) row[2], (String) row[3],
+							(Integer) row[4], (Integer) row[5], new ArrayList<>()));
+
+			if (row[6] != null) { // If there's a topic
+				course.getTopics().add(new TopicDTO((Integer) row[6], (String) row[7], (Integer) row[8],
+						(Integer) row[9], (Integer) row[10]));
+			}
+		}
+		return new ArrayList<>(courseMap.values());
+	}
 }
