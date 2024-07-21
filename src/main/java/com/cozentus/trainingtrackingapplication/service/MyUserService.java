@@ -2,6 +2,8 @@ package com.cozentus.trainingtrackingapplication.service;
 
 import java.util.Optional;
 
+import javax.security.sasl.AuthenticationException;
+
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.model.MyUsers;
@@ -17,12 +19,19 @@ public class MyUserService {
 		this.myUserRepository = myUserRepository;
 	}
 
-	public MyUsers authenticate(String email, String password) {
-		Optional<MyUsers> userCredentials = myUserRepository.findByUserEmail(email);
-		if (userCredentials.isPresent() && userCredentials.get().getUserPassword().equals(password)) {
-			return userCredentials.get();
+	public MyUsers authenticate(String email, String password) throws AuthenticationException {
+		Optional<MyUsers> userOptional = myUserRepository.findByUserEmail(email);
+
+		if (userOptional.isPresent()) {
+			MyUsers user = userOptional.get();
+			if (user.getUserPassword().equals(password)) {
+				return user;
+			} else {
+				throw new AuthenticationException("Wrong password");
+			}
+		} else {
+			throw new AuthenticationException("Email doesn't exist");
 		}
-		return null;
 	}
 
 	public MyUsers addUser(MyUsers user) {

@@ -44,6 +44,7 @@ public class BatchService {
 		this.studentRepository = studentRepository;
 		this.programRepository = programRepository;
 		this.courseRepository = courseRepository;
+
 	}
 
 	public Batch addBatch(Batch batch) {
@@ -64,6 +65,7 @@ public class BatchService {
 		return batchRepository.save(updatedBatch);
 	}
 
+	@Transactional
 	public Boolean deleteBatch(Integer batchId) {
 		Batch batch = batchRepository.findById(batchId)
 				.orElseThrow(() -> new EntityNotFoundException("Batch not found with id: " + batchId));

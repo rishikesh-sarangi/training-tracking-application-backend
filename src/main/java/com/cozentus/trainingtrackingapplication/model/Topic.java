@@ -66,7 +66,7 @@ public class Topic {
 	@Column(name = "summary")
 	private String summary;
 
-	@JsonManagedReference
+	@JsonManagedReference(value = "topicFiles")
 	@OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<TableFiles> files = new ArrayList<>();
 

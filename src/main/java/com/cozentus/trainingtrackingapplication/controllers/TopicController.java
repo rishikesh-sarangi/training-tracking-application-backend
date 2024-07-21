@@ -71,10 +71,12 @@ public class TopicController {
 	public ResponseEntity<Topic> editTopic(@PathVariable Integer topicId, @RequestBody Topic topic) {
 		try {
 			Optional<Topic> updatedTopic = Optional.of(topicService.editTopic(topicId, topic));
-			if (updatedTopic.isPresent()) {
+			if (updatedTopic.get() != null) {
 				return new ResponseEntity<>(updatedTopic.get(), HttpStatus.OK);
 			}
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			else {				
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}

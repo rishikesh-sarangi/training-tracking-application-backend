@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cozentus.trainingtrackingapplication.dto.AttendanceFilterDTO;
 import com.cozentus.trainingtrackingapplication.dto.AttendanceDTO;
 import com.cozentus.trainingtrackingapplication.dto.AttendanceEditDTO;
 import com.cozentus.trainingtrackingapplication.model.Attendance;
@@ -33,8 +34,9 @@ public class AttendanceController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Object> createEvaluation(@RequestBody Attendance attendance) {
+	public ResponseEntity<Object> createEvaluation(@RequestBody AttendanceDTO attendanceDto) {
 		try {
+			Attendance attendance = attendanceService.convertToEntity(attendanceDto);
 			Attendance createdAttendance = attendanceService.addAttendance(attendance);
 			if (createdAttendance != null) {
 				return ResponseUtil.buildSuccessResponse(Collections.singletonList(createdAttendance));
@@ -42,8 +44,7 @@ public class AttendanceController {
 				return ResponseUtil.buildErrorResponse("Error creating attendance entry", HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
-			return ResponseUtil.buildErrorResponse("Error creating attendance entry: " + e.getMessage(),
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
 
@@ -63,7 +64,7 @@ public class AttendanceController {
 
 //	this is a get request i'm using post mapping for filtering
 	@PostMapping("/filter")
-	public ResponseEntity<Object> getAttendancesByFilters(@RequestBody AttendanceDTO filterDTO) {
+	public ResponseEntity<Object> getAttendancesByFilters(@RequestBody AttendanceFilterDTO filterDTO) {
 		try {
 			List<Attendance> attendances = attendanceService.getAttendanceByTeacherBatchProgramAndCourse(
 					filterDTO.getTeacherId(), filterDTO.getBatchId(), filterDTO.getProgramId(), filterDTO.getCourseId(),
@@ -71,7 +72,7 @@ public class AttendanceController {
 			if (!attendances.isEmpty()) {
 				return ResponseUtil.buildSuccessResponse(attendances);
 			} else {
-				return ResponseUtil.buildErrorResponse("Error fetching attendances:", HttpStatus.NOT_FOUND);
+				return ResponseUtil.buildErrorResponse("No attendances found!", HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			return ResponseUtil.buildGenericErrorResponse();
@@ -109,13 +110,13 @@ public class AttendanceController {
 
 //	this is a get request i'm using post mapping for filtering
 	@PostMapping("/by-batch-program-teacher")
-	public ResponseEntity<Object> getAttendanceByTeacherBatchProgramAndCourse(@RequestBody AttendanceDTO filterDTO) {
+	public ResponseEntity<Object> getAttendanceByTeacherBatchProgramAndCourse(@RequestBody AttendanceFilterDTO filterDTO) {
 		try {
 			List<Attendance> attendances = attendanceService.findByBatchIdAndProgramIdAndTeacherId(filterDTO);
 			if (!attendances.isEmpty()) {
 				return ResponseUtil.buildSuccessResponse(attendances);
 			} else {
-				return ResponseUtil.buildErrorResponse("Error fetching attendances:", HttpStatus.NOT_FOUND);
+				return ResponseUtil.buildErrorResponse("No Attendances found", HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			return ResponseUtil.buildGenericErrorResponse();

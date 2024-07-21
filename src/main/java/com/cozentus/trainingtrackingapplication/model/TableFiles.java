@@ -24,11 +24,15 @@ public class TableFiles {
     @Column(name = "file_id")
     private Integer fileId;
 
-    @JsonBackReference
+    @JsonBackReference(value = "topicFiles")
     @ManyToOne
     @JoinColumn(name = "topic_id")
     private Topic topic;
-
+    
+    @JsonBackReference(value = "evaluationFiles")
+    @ManyToOne
+    @JoinColumn(name = "evaluation_id")
+    private Evaluation evaluation;
     
     @NotNull
     @Column(name = "file_name")

@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.cozentus.trainingtrackingapplication.dto.AttendanceFilterDTO;
 import com.cozentus.trainingtrackingapplication.dto.AttendanceDTO;
 import com.cozentus.trainingtrackingapplication.dto.AttendanceEditDTO;
 import com.cozentus.trainingtrackingapplication.model.Attendance;
@@ -63,10 +64,23 @@ public class AttendanceService {
 		return attendanceRepository.save(attendanceToBeEdited);
 	}
 
-	public List<Attendance> findByBatchIdAndProgramIdAndTeacherId(AttendanceDTO filterDTO) {
+	public List<Attendance> findByBatchIdAndProgramIdAndTeacherId(AttendanceFilterDTO filterDTO) {
 		Integer batchId = filterDTO.getBatchId();
 		Integer programId = filterDTO.getProgramId();
 		Integer teacherId = filterDTO.getTeacherId();
 		return attendanceRepository.findByBatchIdAndProgramIdAndTeacherId(batchId, programId, teacherId);
 	}
+	
+    public Attendance convertToEntity(AttendanceDTO attendanceDTO) {
+        Attendance attendance = new Attendance();
+        attendance.setAttendanceDate(attendanceDTO.getAttendanceDate());
+        attendance.setBatch(attendanceDTO.getBatch());
+        attendance.setProgram(attendanceDTO.getProgram());
+        attendance.setCourse(attendanceDTO.getCourse());
+        attendance.setTeacher(attendanceDTO.getTeacher());
+        attendance.setTopic(attendanceDTO.getTopic());
+        attendance.setTopicName(attendanceDTO.getTopicName());
+        attendance.setTopicPercentageCompleted(attendanceDTO.getTopicPercentageCompleted());
+        return attendance;
+    }
 }

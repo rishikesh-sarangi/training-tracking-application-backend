@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.dto.EnrollmentDTO;
@@ -19,25 +20,21 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class EnrollmentService {
-
+	
+	@Autowired
 	private StudentRepository studentRepository;
-
+	
+	@Autowired
 	private BatchRepository batchRepository;
-
+	
+	@Autowired
 	private ProgramRepository programRepository;
-
+	
+	@Autowired
 	private BatchService batchService;
 
-	EnrollmentService(StudentRepository studentRepository, BatchRepository batchRepository,
-			ProgramRepository programRepository, BatchService batchService) {
 
-		this.studentRepository = studentRepository;
-		this.batchRepository = batchRepository;
-		this.programRepository = programRepository;
-		this.batchService = batchService;
-	}
-
-	public void enrollStudents(EnrollmentDTO enrollmentDTO) {
+	public Boolean enrollStudents(EnrollmentDTO enrollmentDTO) {
 		Batch batch = batchRepository.findById(enrollmentDTO.getBatchId()).orElseThrow(
 				() -> new IllegalArgumentException("Batch not found with id: " + enrollmentDTO.getBatchId()));
 		Program program = programRepository.findById(enrollmentDTO.getProgramId()).orElseThrow(
@@ -61,10 +58,12 @@ public class EnrollmentService {
 		batchRepository.save(batch);
 		programRepository.save(program);
 		studentRepository.saveAll(students);
+		
+		return true;
 	}
 
 	@Transactional
-	public void updateEnrollment(EnrollmentDTO enrollmentDTO) {
+	public boolean updateEnrollment(EnrollmentDTO enrollmentDTO) {
 		Batch batch = batchRepository.findById(enrollmentDTO.getBatchId()).orElseThrow(
 				() -> new IllegalArgumentException("Batch not found with id: " + enrollmentDTO.getBatchId()));
 
@@ -91,6 +90,8 @@ public class EnrollmentService {
 		batchRepository.save(batch);
 		programRepository.save(newProgram);
 		studentRepository.saveAll(newStudents);
+		
+		return true;
 	}
 
 	private void deleteProgramAndStudentsForBatch(Integer oldProgramId, Integer batchId) {

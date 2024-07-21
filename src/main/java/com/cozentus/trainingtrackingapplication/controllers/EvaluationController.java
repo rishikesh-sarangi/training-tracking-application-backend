@@ -1,5 +1,6 @@
 package com.cozentus.trainingtrackingapplication.controllers;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,11 +14,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseTeacherResponse;
 import com.cozentus.trainingtrackingapplication.dto.EvaluationDTO;
 import com.cozentus.trainingtrackingapplication.model.Evaluation;
+import com.cozentus.trainingtrackingapplication.model.TableFiles;
 import com.cozentus.trainingtrackingapplication.service.EvaluationService;
 import com.cozentus.trainingtrackingapplication.util.ResponseUtil;
 
@@ -47,8 +51,9 @@ public class EvaluationController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Object> createEvaluation(@RequestBody Evaluation evaluation) {
+	public ResponseEntity<Object> createEvaluation(@RequestBody EvaluationDTO evaluationDto) {
 		try {
+			Evaluation evaluation = evaluationService.convertToEntity(evaluationDto);
 			Evaluation createdEvaluation = evaluationService.saveEvaluation(evaluation);
 			if (createdEvaluation != null) {
 				return ResponseUtil.buildSuccessResponse(Collections.singletonList(createdEvaluation));
@@ -107,4 +112,34 @@ public class EvaluationController {
 			return ResponseUtil.buildGenericErrorResponse();
 		}
 	}
+	
+    @PostMapping("/{evaluationId}/upload")
+    public ResponseEntity<Object> uploadFile(@PathVariable Integer evaluationId, @RequestParam("file") MultipartFile file) {
+        try {
+            TableFiles savedFile = evaluationService.saveFile(evaluationId, file);
+            if(savedFile != null) {
+            	return ResponseUtil.buildSuccessResponse(Collections.emptyList());
+            }
+            else {
+            	return ResponseUtil.buildErrorResponse("File upload failed", HttpStatus.NOT_FOUND);
+            }
+        } catch (IOException e) {
+        	return ResponseUtil.buildErrorResponse("File Already Exists", HttpStatus.NOT_FOUND);
+        }
+    }
+    
+    @GetMapping("/file")
+    public ResponseEntity<Object> doesFileExist(@RequestParam("fileName") String fileName) {
+        try {
+            Boolean savedFile = evaluationService.doesFileExist(fileName);
+            if(savedFile.equals(true)) {
+            	return ResponseUtil.buildSuccessResponse(Collections.emptyList());
+            }
+            else {
+            	return ResponseUtil.buildErrorResponse("File Already Exists", HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+        	return ResponseUtil.buildGenericErrorResponse();
+        }
+    }
 }

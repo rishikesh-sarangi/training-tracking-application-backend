@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -19,4 +20,8 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Integer>
 	@Query("SELECT a FROM Attendance a WHERE a.batch.batchId = :batchId AND a.program.programId = :programId AND a.teacher.teacherId = :teacherId")
 	List<Attendance> findByBatchIdAndProgramIdAndTeacherId(@Param("batchId") Integer batchId,
 			@Param("programId") Integer programId, @Param("teacherId") Integer teacherId);
+
+	@Modifying
+	@Query("DELETE FROM Attendance a WHERE a.batch.id = :batchId")
+	void deleteAllByBatchId(@Param("batchId") Integer batchId);
 }

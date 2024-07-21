@@ -12,9 +12,14 @@ import com.cozentus.trainingtrackingapplication.model.Teacher;
 public interface TeacherRepository extends JpaRepository<Teacher, Integer> {
 
 //	query to find teacherId by teacherEmail
-	@Query(value = "SELECT teacher_id FROM teacher WHERE email = :teacherEmail", nativeQuery = true)
-	Integer findTeacherIdByTeacherEmail(@Param("teacherEmail") String teacherEmail);
-
+	 @Query("SELECT t.teacherId FROM Teacher t WHERE t.teacherEmail = :teacherEmail")
+	    Integer findTeacherIdByTeacherEmail(@Param("teacherEmail") String teacherEmail);
+	
+//	 dont delete incase the JPA query doesnt work
+//	 @Query("SELECT t.teacherId FROM Teacher t WHERE t.teacherEmail = :teacherEmail")
+//	    Integer findTeacherIdByTeacherEmail(@Param("teacherEmail") String teacherEmail);
+	
+	
 	@Query(value = "SELECT DISTINCT " +
 	           "b.batch_id as batchId, b.batch_code as batchCode, b.batch_name as batchName, b.start_date as batchStartDate, " +
 	           "p.program_id as programId, p.program_code as programCode, p.program_name as programName, " +
