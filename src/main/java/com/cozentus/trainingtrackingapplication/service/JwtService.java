@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class JwtService {
 
-	private static final String SECRET = "6DE68F53F1C08B7F593ADBFFA8AD3C0859FF25B1A0627EAD33AF3CDA93CBD06AEB7BCF0E1D197797CB0578A00A086A7F58A925EFA4F293E1F91B236FA35AB34C";
+	private static final String SECRET = "dsadsa";
 	private static final long VALIDITY = TimeUnit.MINUTES.toMillis(30);
 
 	public String generateToken(UserDetails userDetails) {
