@@ -9,6 +9,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,17 +39,17 @@ public class SecurityConfig {
 		http.authenticationProvider(authenticationProvider());
 		http.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth.requestMatchers("/users/login").permitAll()
-						.requestMatchers("/users/**").hasRole("ADMIN")
-						.requestMatchers("/attendance/**").hasRole("TEACHER").requestMatchers("/evaluations/**")
-						.hasAnyRole("TEACHER", "ADMIN").requestMatchers("/evaluationStudent/**").hasRole("TEACHER")
-						.requestMatchers("/enrollments/**").hasRole("ADMIN").requestMatchers("/batches/**")
-						.hasAnyRole("ADMIN", "TEACHER").requestMatchers("/programs/**").hasRole("ADMIN")
-						.requestMatchers("/batch-course-teacher/**").hasAnyRole("ADMIN", "TEACHER")
-						.requestMatchers("/students/**").hasAnyRole("ADMIN", "TEACHER").requestMatchers("/teachers/**")
-						.hasAnyRole("ADMIN", "TEACHER").requestMatchers("/topics/**").hasAnyRole("ADMIN", "TEACHER")
-						.requestMatchers("/courses/**").hasAnyRole("ADMIN", "TEACHER").anyRequest().authenticated())
+						.requestMatchers("/users/**").hasRole("ADMIN").requestMatchers("/attendance/**")
+						.hasRole("TEACHER").requestMatchers("/evaluations/**").hasAnyRole("TEACHER", "ADMIN")
+						.requestMatchers("/evaluationStudent/**").hasRole("TEACHER").requestMatchers("/enrollments/**")
+						.hasRole("ADMIN").requestMatchers("/batches/**").hasAnyRole("ADMIN", "TEACHER")
+						.requestMatchers("/programs/**").hasRole("ADMIN").requestMatchers("/batch-course-teacher/**")
+						.hasAnyRole("ADMIN", "TEACHER").requestMatchers("/students/**").hasAnyRole("ADMIN", "TEACHER")
+						.requestMatchers("/teachers/**").hasAnyRole("ADMIN", "TEACHER").requestMatchers("/topics/**")
+						.hasAnyRole("ADMIN", "TEACHER").requestMatchers("/courses/**").hasAnyRole("ADMIN", "TEACHER")
+						.anyRequest().authenticated())
 				.httpBasic(Customizer.withDefaults());
-		http.addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+				http.addFilterAt(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
 
@@ -64,11 +65,11 @@ public class SecurityConfig {
 
 	@Bean
 	DaoAuthenticationProvider authenticationProvider() {
-	    DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-	    authProvider.setUserDetailsService(userDetailsService());
-	    authProvider.setPasswordEncoder(passwordEncoder());
-	    authProvider.setHideUserNotFoundExceptions(false);
-	    return authProvider;
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+		authProvider.setUserDetailsService(userDetailsService());
+		authProvider.setPasswordEncoder(passwordEncoder());
+		authProvider.setHideUserNotFoundExceptions(false);
+		return authProvider;
 	}
 
 	@Bean
