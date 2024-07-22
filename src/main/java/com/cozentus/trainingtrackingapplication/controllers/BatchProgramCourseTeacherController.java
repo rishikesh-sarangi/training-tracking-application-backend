@@ -1,6 +1,9 @@
 package com.cozentus.trainingtrackingapplication.controllers;
 
+import java.util.Collections;
 import java.util.List;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +18,7 @@ import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseTeacherDel
 import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseTeacherResponse;
 import com.cozentus.trainingtrackingapplication.service.BatchProgramCourseTeacherService;
 import com.cozentus.trainingtrackingapplication.service.BatchService;
+import com.cozentus.trainingtrackingapplication.util.ResponseUtil;
 
 @RestController
 @CrossOrigin("http://localhost:4200/")
@@ -32,25 +36,49 @@ public class BatchProgramCourseTeacherController {
 	}
 
 	@PostMapping("/update")
-	public ResponseEntity<Boolean> updateBatchCourseTeacher(@RequestBody BatchProgramCourseTeacherResponse dto) {
-		batchProgramCourseTeacherService.updateBatchProgramCourseTeacher(dto);
-		return ResponseEntity.ok(true);
+	public ResponseEntity<Object> updateBatchCourseTeacher(@RequestBody BatchProgramCourseTeacherResponse dto) {
+		try {
+			Boolean response = batchProgramCourseTeacherService.updateBatchProgramCourseTeacher(dto);
+			if (response.equals(true)) {
+				return ResponseUtil.buildSuccessResponse(Collections.emptyList());
+			} else {
+				return ResponseUtil.buildErrorResponse("Batch not found", HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			return ResponseUtil.buildGenericErrorResponse();
+		}
+
 	}
 
 	@GetMapping("/{batchId}/{programId}")
 	public ResponseEntity<List<BatchProgramCourseTeacherDTO>> getCourseAndTeacherByBatchAndProgram(
 			@PathVariable Integer batchId, @PathVariable Integer programId) {
-		List<BatchProgramCourseTeacherDTO> result = batchProgramCourseTeacherService
-				.getCourseAndTeacherByBatchAndProgram(batchId, programId);
-		return ResponseEntity.ok(result);
+		try {
+			List<BatchProgramCourseTeacherDTO> result = batchProgramCourseTeacherService
+					.getCourseAndTeacherByBatchAndProgram(batchId, programId);
+			if (!result.isEmpty()) {
+				return ResponseEntity.ok(result);
+			} else {
+				return ResponseEntity.notFound().build();
+			}
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().build();
+		}
 	}
 
 //    this is a delete function even tho we are using post mapping
 	@PostMapping
-	public ResponseEntity<Boolean> deleteBatchProgramCourseTeacherByBatchId(
+	public ResponseEntity<Object> deleteBatchProgramCourseTeacherByBatchId(
 			@RequestBody BatchProgramCourseTeacherDeleteDTO dto) {
-//		Optional<Boolean> deletedBatchProgramCourseTeacher = Optional
-		batchService.deleteByBatchIdAndProgramIdAndCourseIdAndTeacherId(dto);
-		return ResponseEntity.ok(true);
+		try {
+			Boolean response = batchService.deleteByBatchIdAndProgramIdAndCourseIdAndTeacherId(dto);
+			if (response.equals(true)) {
+				return ResponseUtil.buildSuccessResponse(Collections.emptyList());
+			} else {
+				return ResponseUtil.buildErrorResponse("Batch not found", HttpStatus.NOT_FOUND);
+			}
+		} catch (Exception e) {
+			return ResponseUtil.buildGenericErrorResponse();
+		}
 	}
 }

@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.cozentus.trainingtrackingapplication.model.Attendance;
+import com.cozentus.trainingtrackingapplication.model.Course;
+import com.cozentus.trainingtrackingapplication.model.Teacher;
 
 public interface AttendanceRepository extends JpaRepository<Attendance, Integer> {
 	@Query("SELECT a FROM Attendance a WHERE a.teacher.teacherId = :teacherId AND a.batch.batchId = :batchId "
@@ -24,4 +26,6 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Integer>
 	@Modifying
 	@Query("DELETE FROM Attendance a WHERE a.batch.id = :batchId")
 	void deleteAllByBatchId(@Param("batchId") Integer batchId);
+	
+	List<Attendance> findByTeacherAndCourse(Teacher teacher, Course course);
 }

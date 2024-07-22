@@ -11,13 +11,11 @@ import com.cozentus.trainingtrackingapplication.model.Teacher;
 
 public interface TeacherRepository extends JpaRepository<Teacher, Integer> {
 
-//	query to find teacherId by teacherEmail
-	 @Query("SELECT t.teacherId FROM Teacher t WHERE t.teacherEmail = :teacherEmail")
-	    Integer findTeacherIdByTeacherEmail(@Param("teacherEmail") String teacherEmail);
+
+// find teacher by email
+	@Query("SELECT t FROM Teacher t WHERE t.teacherEmail = :teacherEmail")
+	Teacher findTeacherByTeacherEmail(@Param("teacherEmail") String teacherEmail);
 	
-//	 dont delete incase the JPA query doesnt work
-//	 @Query("SELECT t.teacherId FROM Teacher t WHERE t.teacherEmail = :teacherEmail")
-//	    Integer findTeacherIdByTeacherEmail(@Param("teacherEmail") String teacherEmail);
 	
 	
 	@Query(value = "SELECT DISTINCT " +

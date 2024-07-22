@@ -68,9 +68,9 @@ public class EvaluationService {
 
 	public boolean doesFileExist(String fileName) {
 		if (tableFileRepository.existsByFileName(fileName)) {
-			return false;
-		} else {
 			return true;
+		} else {
+			return false;
 		}
 
 	}

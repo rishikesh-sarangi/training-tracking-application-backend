@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/src/main/java/com/cozentus/trainingtrackingapplication/filter
+/src/main/java/com/cozentus/trainingtrackingapplication/service/.JwtService

@@ -2,6 +2,7 @@ package com.cozentus.trainingtrackingapplication.model;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -62,7 +63,7 @@ public class Teacher {
 	@ManyToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH })
 	@JoinTable(name = "teacher_course", joinColumns = @JoinColumn(name = "teacher_id"), inverseJoinColumns = @JoinColumn(name = "course_id"))
 	@JsonIgnoreProperties("topics")
-	private List<Course> courses;
+	private List<Course> courses = new ArrayList<>();
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "teacher",cascade = CascadeType.ALL)

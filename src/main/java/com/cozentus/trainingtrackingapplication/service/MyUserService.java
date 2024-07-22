@@ -4,13 +4,18 @@ import java.util.Optional;
 
 import javax.security.sasl.AuthenticationException;
 
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.model.MyUsers;
 import com.cozentus.trainingtrackingapplication.repository.MyUserRepository;
 
 @Service
-public class MyUserService {
+public class MyUserService implements UserDetailsService {
 
 	private MyUserRepository myUserRepository;
 
@@ -87,5 +92,20 @@ public class MyUserService {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException, BadCredentialsException {
+	    Optional<MyUsers> user = myUserRepository.findByUserEmail(username);
+	    if (user.isPresent()) {
+	        var userObj = user.get();
+	        return User.builder()
+	                .username(userObj.getUserEmail())
+	                .password(userObj.getUserPassword())
+	                .roles(userObj.getUserRole().toUpperCase())
+	                .build();
+	    } else {
+	        throw new UsernameNotFoundException(username);
+	    }
 	}
 }

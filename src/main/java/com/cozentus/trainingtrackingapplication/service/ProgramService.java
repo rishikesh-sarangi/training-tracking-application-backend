@@ -59,17 +59,35 @@ public class ProgramService {
 	}
 
 	public Program editProgram(Integer programId, Program program) {
-		Optional<Program> updatedProgram = programRepository.findById(programId);
+		Optional<Program> updatedProgramOpt = programRepository.findById(programId);
 
-//		update everything except for the id
-		if (updatedProgram.isPresent()) {
-			Program programToUpdate = updatedProgram.get();
+		if (updatedProgramOpt.isPresent()) {
+			Program programToUpdate = updatedProgramOpt.get();
+			List<Course> existingCourses = programToUpdate.getCourses();
+			List<Course> newCourses = program.getCourses();
+
+			// Find and delete excluded old courses
+			for (Course existingCourse : existingCourses) {
+				boolean isExcluded = newCourses.stream()
+						.noneMatch(newCourse -> newCourse.getCourseId().equals(existingCourse.getCourseId()));
+				if (isExcluded) {
+					batchRepository.deleteByProgramIdAndCourseId(programId, existingCourse.getCourseId());
+				}
+			}
+
+			// Update the program details
 			programToUpdate.setProgramName(program.getProgramName());
 			programToUpdate.setProgramCode(program.getProgramCode());
 			programToUpdate.setDescription(program.getDescription());
 			programToUpdate.setTheoryTime(program.getTheoryTime());
 			programToUpdate.setPracticeTime(program.getPracticeTime());
-			programToUpdate.setCourses(program.getCourses());
+
+			// Update courses only if they are different
+			boolean areCoursesDifferent = !existingCourses.equals(newCourses);
+			if (areCoursesDifferent) {
+				programToUpdate.setCourses(newCourses);
+			}
+
 			return programRepository.save(programToUpdate);
 		}
 

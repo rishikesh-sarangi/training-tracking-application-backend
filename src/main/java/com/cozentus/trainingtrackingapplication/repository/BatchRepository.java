@@ -65,6 +65,18 @@ public interface BatchRepository extends JpaRepository<Batch, Integer> {
 	@Query(value = "DELETE FROM batch_program_course_teacher WHERE program_id = :programId", nativeQuery = true)
 	void deleteByProgramId(@Param("programId") Integer programId);
 	
+//	delete batch_program_course_teacher based on programId and courseId
+	@Modifying
+	@Transactional
+	@Query(value = "DELETE FROM batch_program_course_teacher WHERE program_id = :programId AND course_id = :courseId", nativeQuery = true)
+	void deleteByProgramIdAndCourseId(@Param("programId") Integer programId, @Param("courseId") Integer courseId);
+
+//	delete batch_program_course_teacher based on teacherId and coruseId
+	@Modifying
+	@Transactional
+	@Query(value = "DELETE FROM batch_program_course_teacher WHERE teacher_id = :teacherId AND course_id = :courseId", nativeQuery = true)
+	void deleteByTeacherIdAndCourseId(@Param("teacherId") Integer teacherId, @Param("courseId") Integer courseId);
+	
 //	delete batch_program_course_teacher based on teacherId
 	@Modifying
 	@Transactional

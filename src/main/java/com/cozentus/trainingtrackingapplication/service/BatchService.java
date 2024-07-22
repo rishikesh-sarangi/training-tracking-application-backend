@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class BatchService {
+	private static final String BATCH_NOT_FOUND_MESSAGE = "Batch not found: ";
 
 	private BatchRepository batchRepository;
 
@@ -57,7 +59,7 @@ public class BatchService {
 
 	public Batch editBatch(Integer batchId, Batch batch) {
 		Batch updatedBatch = batchRepository.findById(batchId)
-				.orElseThrow(() -> new EntityNotFoundException("Batch not found with id: " + batch.getBatchId()));
+				.orElseThrow(() -> new EntityNotFoundException(BATCH_NOT_FOUND_MESSAGE + batch.getBatchId()));
 		updatedBatch.setBatchName(batch.getBatchName());
 		updatedBatch.setBatchCode(batch.getBatchCode());
 		updatedBatch.setBatchStartDate(batch.getBatchStartDate());
@@ -68,7 +70,7 @@ public class BatchService {
 	@Transactional
 	public Boolean deleteBatch(Integer batchId) {
 		Batch batch = batchRepository.findById(batchId)
-				.orElseThrow(() -> new EntityNotFoundException("Batch not found with id: " + batchId));
+				.orElseThrow(() -> new EntityNotFoundException(BATCH_NOT_FOUND_MESSAGE + batchId));
 
 		for (Student student : batch.getStudents()) {
 			student.getPrograms().clear();
@@ -82,7 +84,7 @@ public class BatchService {
 
 	public List<ProgramDTO> getProgramsWithStudentsByBatchId(Integer batchId) {
 		Batch batch = batchRepository.findByIdWithProgramsAndStudents(batchId)
-				.orElseThrow(() -> new EntityNotFoundException("Batch not found with id: " + batchId));
+				.orElseThrow(() -> new EntityNotFoundException(BATCH_NOT_FOUND_MESSAGE + batchId));
 
 		return convertToProgramDTOList(batch.getPrograms());
 	}
@@ -130,11 +132,10 @@ public class BatchService {
 
 	private List<CourseWithTeachersDTO> convertToCourseDTOList(List<Course> courses,
 			Map<Integer, Set<Teacher>> teachersByCourseId) {
-		return courses.stream()
-				.map(course -> convertToCourseDTO(course,
-						teachersByCourseId.getOrDefault(course.getCourseId(), new HashSet<>())))
-				.collect(Collectors.toList());
+		return courses.stream().map(course -> convertToCourseDTO(course,
+				teachersByCourseId.getOrDefault(course.getCourseId(), new HashSet<>()))).toList();
 	}
+
 
 	private CourseWithTeachersDTO convertToCourseDTO(Course course, Set<Teacher> teachers) {
 		CourseWithTeachersDTO dto = new CourseWithTeachersDTO();
@@ -156,7 +157,7 @@ public class BatchService {
 				.orElseThrow(() -> new EntityNotFoundException("Program not found"));
 
 		Batch batch = batchRepository.findById(batchId)
-				.orElseThrow(() -> new EntityNotFoundException("Batch not found"));
+				.orElseThrow(() -> new EntityNotFoundException(BATCH_NOT_FOUND_MESSAGE));
 
 		// Remove program from batch
 		batch.getPrograms().remove(program);
@@ -189,7 +190,15 @@ public class BatchService {
 
 	@Transactional
 	public Boolean deleteByBatchIdAndProgramIdAndCourseIdAndTeacherId(BatchProgramCourseTeacherDeleteDTO dto) {
+
 		Integer batchId = dto.getBatchId();
+
+		Optional<Batch> batch = batchRepository.findById(batchId);
+
+		if (batch.isEmpty()) {
+			return false;
+		}
+
 		Integer programId = dto.getProgramId();
 		Integer courseId = dto.getCourseId();
 		Integer teacherId = dto.getTeacherId();

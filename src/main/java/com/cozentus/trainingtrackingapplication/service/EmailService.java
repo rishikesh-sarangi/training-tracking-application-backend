@@ -7,6 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.dto.TeacherEditDTO;
@@ -17,13 +18,19 @@ import com.cozentus.trainingtrackingapplication.model.Teacher;
 @Service
 public class EmailService {
 
+	private static final String SUBJECT = "Details for your Training App Account";
+
 	private JavaMailSender javaMailSender;
 
 	private TeacherService teacherService;
 
 	private MyUserService myUserService;
-	
-	EmailService(JavaMailSender javaMailSender, TeacherService teacherService, MyUserService myUserService){		
+
+	private PasswordEncoder passwordEncoder;
+
+	EmailService(JavaMailSender javaMailSender, TeacherService teacherService, MyUserService myUserService,
+			PasswordEncoder passwordEncoder) {
+		this.passwordEncoder = passwordEncoder;
 		this.javaMailSender = javaMailSender;
 		this.teacherService = teacherService;
 		this.myUserService = myUserService;
@@ -56,7 +63,7 @@ public class EmailService {
 
 	public boolean sendWelcomeEmailStudent(Student student) {
 		String recipient = student.getStudentEmail();
-		String subject = "Details for your Training App Account";
+		String subject = SUBJECT;
 		String password = generateRandomPassword();
 		String body = "Hello Student: \n" + "Your Email: " + student.getStudentEmail() + "\n Your Password: "
 				+ password;
@@ -66,7 +73,7 @@ public class EmailService {
 
 	public boolean sendWelcomeEmailTeacher(Teacher teacher) {
 		String recipient = teacher.getTeacherEmail();
-		String subject = "Details for your Training App Account";
+		String subject = SUBJECT;
 		String password = generateRandomPassword();
 		String body = "Hello Teacher: \n" + "Your Email: " + teacher.getTeacherEmail() + "\n Your Password: "
 				+ password;
@@ -75,12 +82,11 @@ public class EmailService {
 		MyUsers newUser = new MyUsers();
 		newUser.setUserEmail(teacher.getTeacherEmail());
 		newUser.setUsername(teacher.getTeacherName());
-		newUser.setUserPassword(password);
+		newUser.setUserPassword(passwordEncoder.encode(password));
 		newUser.setUserRole("TEACHER");
 
 		myUserService.addUser(newUser);
 		teacherService.addTeacher(teacher);
-//		teacherService.editTeacher(teacher.getTeacherId(), user);
 
 		return sendEmail(recipient, subject, body);
 	}
@@ -101,19 +107,19 @@ public class EmailService {
 				teacherService.editTeacher(teacherId, teacher);
 				return true;
 			} else {
-				
+
 				myUserService.deleteUser(existingUser.get().getUserId());
-				
+
 				String recipient = teacher.getNewEmail();
-				String subject = "Details for your Training App Account";
+				String subject = "NEW " + SUBJECT;
 				String password = generateRandomPassword();
-				String body = "Hello Teacher: \n" + "Your New Email: " + teacher.getNewEmail() + "\nYour Password: "
+				String body = "Hello Teacher: \n" + "Your New Email: " + teacher.getNewEmail() + "\nYour New Password: "
 						+ password;
 
 				MyUsers editedUser = new MyUsers();
 				editedUser.setUserEmail(teacher.getNewEmail());
 				editedUser.setUsername(teacher.getTeacherName());
-				editedUser.setUserPassword(password);
+				editedUser.setUserPassword(passwordEncoder.encode(password));
 				editedUser.setUserRole("TEACHER");
 
 				myUserService.addUser(editedUser);

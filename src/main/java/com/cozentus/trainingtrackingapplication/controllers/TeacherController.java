@@ -74,8 +74,8 @@ public class TeacherController {
 	}
 
 	@GetMapping("/{teacherEmail}")
-	public ResponseEntity<Integer> getTeacherIdByTeacherEmail(@PathVariable String teacherEmail) {
-		Optional<Integer> teacherId = Optional.ofNullable(teacherService.getTeacherId(teacherEmail));
+	public ResponseEntity<Teacher> getTeacherByTeacherEmail(@PathVariable String teacherEmail) {
+		Optional<Teacher> teacherId = Optional.ofNullable(teacherService.getTeacher(teacherEmail));
 		if (teacherId.isPresent()) {
 			return new ResponseEntity<>(teacherId.get(), HttpStatus.OK);
 		}

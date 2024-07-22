@@ -133,10 +133,10 @@ public class EvaluationController {
         try {
             Boolean savedFile = evaluationService.doesFileExist(fileName);
             if(savedFile.equals(true)) {
-            	return ResponseUtil.buildSuccessResponse(Collections.emptyList());
+            	return ResponseUtil.buildErrorResponse("File Already Exists", HttpStatus.NOT_FOUND);
             }
             else {
-            	return ResponseUtil.buildErrorResponse("File Already Exists", HttpStatus.NOT_FOUND);
+            	return ResponseUtil.buildSuccessResponse(Collections.emptyList());
             }
         } catch (Exception e) {
         	return ResponseUtil.buildGenericErrorResponse();

@@ -12,7 +12,6 @@ import com.cozentus.trainingtrackingapplication.repository.CourseRepository;
 import com.cozentus.trainingtrackingapplication.repository.ProgramRepository;
 import com.cozentus.trainingtrackingapplication.repository.TeacherRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -39,22 +38,21 @@ public class BatchProgramCourseTeacherService {
 	}
 
 	@Transactional
-	public void updateBatchProgramCourseTeacher(BatchProgramCourseTeacherResponse dto) {
+	public boolean updateBatchProgramCourseTeacher(BatchProgramCourseTeacherResponse dto) {
 
 		// verify that the entities exist
-		batchRepository.findById(dto.getBatchId()).orElseThrow(() -> new EntityNotFoundException("Batch not found"));
-
-		programRepository.findById(dto.getProgramId())
-				.orElseThrow(() -> new EntityNotFoundException("Program not found"));
-
-		courseRepository.findById(dto.getCourseId()).orElseThrow(() -> new EntityNotFoundException("Course not found"));
-
-		teacherRepository.findById(dto.getTeacherId())
-				.orElseThrow(() -> new EntityNotFoundException("Teacher not found"));
+	    if (batchRepository.findById(dto.getBatchId()).isEmpty() ||
+	            programRepository.findById(dto.getProgramId()).isEmpty() ||
+	            courseRepository.findById(dto.getCourseId()).isEmpty() ||
+	            teacherRepository.findById(dto.getTeacherId()).isEmpty()) {
+	            return false;
+	        }
 
 		// innsert into junction table using custom query
 		batchProgramCourseTeacherRepository.insertBatchProgramCourseTeacher(dto.getBatchId(), dto.getProgramId(),
 				dto.getCourseId(), dto.getTeacherId());
+		
+		return true;
 	}
 
 	public List<BatchProgramCourseTeacherDTO> getCourseAndTeacherByBatchAndProgram(Integer batchId, Integer programId) {
