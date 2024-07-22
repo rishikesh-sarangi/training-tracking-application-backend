@@ -51,7 +51,6 @@ public class EmailService {
 			javaMailSender.send(message);
 			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
 			return false;
 		}
 	}
@@ -65,7 +64,7 @@ public class EmailService {
 		String recipient = student.getStudentEmail();
 		String subject = SUBJECT;
 		String password = generateRandomPassword();
-		String body = "Hello Student: \n" + "Your Email: " + student.getStudentEmail() + "\n Your Password: "
+		String body = "Hello Student: \n" + "Your Email: " + student.getStudentEmail() + "\nYour Password: "
 				+ password;
 
 		return sendEmail(recipient, subject, body);

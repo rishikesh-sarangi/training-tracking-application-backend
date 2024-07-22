@@ -31,7 +31,7 @@ import com.cozentus.trainingtrackingapplication.repository.TeacherRepository;
 import com.cozentus.trainingtrackingapplication.service.CourseService;
 import com.cozentus.trainingtrackingapplication.service.ProgramService;
 
-public class CourseTests {
+class CourseTests {
 
 	@InjectMocks
 	private CourseService courseService;
@@ -110,7 +110,7 @@ public class CourseTests {
 		Course course = new Course();
 		when(mockCourseService.addCourse(any(Course.class))).thenReturn(course);
 
-		ResponseEntity<Course> response = courseController.createCourse(course);
+		ResponseEntity<Object> response = courseController.createCourse(course);
 
 		assertEquals(HttpStatus.CREATED, response.getStatusCode());
 		verify(mockCourseService, times(1)).addCourse(course);
@@ -143,7 +143,7 @@ public class CourseTests {
 		Course course = new Course();
 		when(mockCourseService.updateCourse(any(Course.class), anyInt())).thenReturn(course);
 
-		ResponseEntity<Course> response = courseController.updateCourse(course, 1);
+		ResponseEntity<Object> response = courseController.updateCourse(course, 1);
 
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 		verify(mockCourseService, times(1)).updateCourse(course, 1);

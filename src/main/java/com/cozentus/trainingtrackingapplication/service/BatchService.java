@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseTeacherDeleteDTO;
@@ -32,6 +33,8 @@ import jakarta.transaction.Transactional;
 public class BatchService {
 	private static final String BATCH_NOT_FOUND_MESSAGE = "Batch not found: ";
 
+	private static final String DUPLICATE = "Batch with the same code or name already exists.";
+
 	private BatchRepository batchRepository;
 
 	private StudentRepository studentRepository;
@@ -50,7 +53,11 @@ public class BatchService {
 	}
 
 	public Batch addBatch(Batch batch) {
-		return batchRepository.save(batch);
+		try {
+			return batchRepository.save(batch);
+		} catch (DataIntegrityViolationException e) {
+			throw new DataIntegrityViolationException(DUPLICATE);
+		}
 	}
 
 	public List<Batch> getAllBatches() {
@@ -58,6 +65,12 @@ public class BatchService {
 	}
 
 	public Batch editBatch(Integer batchId, Batch batch) {
+
+		if (batchRepository.existsByBatchCode(batch.getBatchCode())
+				|| batchRepository.existsByBatchName(batch.getBatchName())) {
+			throw new DataIntegrityViolationException(DUPLICATE);
+		}
+
 		Batch updatedBatch = batchRepository.findById(batchId)
 				.orElseThrow(() -> new EntityNotFoundException(BATCH_NOT_FOUND_MESSAGE + batch.getBatchId()));
 		updatedBatch.setBatchName(batch.getBatchName());
@@ -135,7 +148,6 @@ public class BatchService {
 		return courses.stream().map(course -> convertToCourseDTO(course,
 				teachersByCourseId.getOrDefault(course.getCourseId(), new HashSet<>()))).toList();
 	}
-
 
 	private CourseWithTeachersDTO convertToCourseDTO(Course course, Set<Teacher> teachers) {
 		CourseWithTeachersDTO dto = new CourseWithTeachersDTO();

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.dto.BatchProgramCourseDTO;
@@ -19,10 +20,13 @@ import com.cozentus.trainingtrackingapplication.repository.CourseRepository;
 import com.cozentus.trainingtrackingapplication.repository.ProgramRepository;
 import com.cozentus.trainingtrackingapplication.repository.TeacherRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
 @Service
 public class CourseService {
+	
+	private static final String DUPLICATE = "Course with the same code or name already exists.";
 
 	private CourseRepository courseRepository;
 
@@ -44,7 +48,11 @@ public class CourseService {
 	}
 
 	public Course addCourse(Course course) {
-		return courseRepository.save(course);
+		try {
+			return courseRepository.save(course);
+		} catch (DataIntegrityViolationException e) {
+			throw new DataIntegrityViolationException(DUPLICATE);
+		}
 	}
 
 	public List<Course> getAllCourses() {
@@ -54,15 +62,20 @@ public class CourseService {
 	public Course updateCourse(Course courseDetails, Integer id) {
 		Optional<Course> optionalCourse = courseRepository.findById(id);
 		if (optionalCourse.isPresent()) {
-			Course existingCourse = optionalCourse.get();
-			existingCourse.setCode(courseDetails.getCode());
-			existingCourse.setCourseName(courseDetails.getCourseName());
-			existingCourse.setDescription(courseDetails.getDescription());
-			existingCourse.setPracticeTime(courseDetails.getPracticeTime());
-			existingCourse.setTheoryTime(courseDetails.getTheoryTime());
-			return courseRepository.save(existingCourse);
+			try {
+				Course existingCourse = optionalCourse.get();
+				existingCourse.setCode(courseDetails.getCode());
+				existingCourse.setCourseName(courseDetails.getCourseName());
+				existingCourse.setDescription(courseDetails.getDescription());
+				existingCourse.setPracticeTime(courseDetails.getPracticeTime());
+				existingCourse.setTheoryTime(courseDetails.getTheoryTime());
+				return courseRepository.save(existingCourse);
+			} catch (DataIntegrityViolationException e) {
+				throw new DataIntegrityViolationException(DUPLICATE);
+			}
+
 		} else {
-			return null;
+			throw new EntityNotFoundException("Course Not Found");
 		}
 	}
 

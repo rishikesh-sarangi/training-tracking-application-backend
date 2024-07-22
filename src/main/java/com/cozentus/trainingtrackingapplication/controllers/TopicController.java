@@ -3,6 +3,7 @@ package com.cozentus.trainingtrackingapplication.controllers;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cozentus.trainingtrackingapplication.dto.TopicAddDTO;
 import com.cozentus.trainingtrackingapplication.model.Topic;
 import com.cozentus.trainingtrackingapplication.service.TopicService;
 
@@ -50,12 +52,17 @@ public class TopicController {
 	}
 
 	@PostMapping("/{courseId}")
-	public ResponseEntity<Topic> createTopic(@PathVariable Integer courseId, @RequestBody Topic topic) {
-		Optional<Topic> createdTopic = Optional.ofNullable(topicService.addTopic(courseId, topic));
-		if (createdTopic.isPresent()) {
-			return new ResponseEntity<>(createdTopic.get(), HttpStatus.CREATED);
+	public ResponseEntity<Object> createTopic(@PathVariable Integer courseId, @RequestBody TopicAddDTO topic) {
+		try {
+			Topic addedTopic = topicService.addTopic(courseId, topic);
+			return new ResponseEntity<>(addedTopic, HttpStatus.CREATED);
+		} catch (DataIntegrityViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		} catch (RuntimeException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@DeleteMapping("/{topicId}")
@@ -68,15 +75,16 @@ public class TopicController {
 	}
 
 	@PutMapping("/{topicId}")
-	public ResponseEntity<Topic> editTopic(@PathVariable Integer topicId, @RequestBody Topic topic) {
+	public ResponseEntity<Object> editTopic(@PathVariable Integer topicId, @RequestBody Topic topic) {
 		try {
-			Optional<Topic> updatedTopic = Optional.of(topicService.editTopic(topicId, topic));
-			if (updatedTopic.get() != null) {
-				return new ResponseEntity<>(updatedTopic.get(), HttpStatus.OK);
+			Topic updatedTopic = topicService.editTopic(topicId, topic);
+			if (updatedTopic != null) {
+				return new ResponseEntity<>(updatedTopic, HttpStatus.CREATED);
+			} else {
+				return new ResponseEntity<>("Something went wrong", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			else {				
-				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-			}
+		} catch (DataIntegrityViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}

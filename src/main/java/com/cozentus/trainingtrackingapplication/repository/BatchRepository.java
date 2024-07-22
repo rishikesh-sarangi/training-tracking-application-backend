@@ -82,4 +82,7 @@ public interface BatchRepository extends JpaRepository<Batch, Integer> {
 	@Transactional
 	@Query(value = "DELETE FROM batch_program_course_teacher WHERE teacher_id = :teacherId", nativeQuery = true)
 	void deleteByTeacherId(@Param("teacherId") Integer teacherId);
+	
+	boolean existsByBatchCode(String batchCode);
+	boolean existsByBatchName(String batchName);
 }

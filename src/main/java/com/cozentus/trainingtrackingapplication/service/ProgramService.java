@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.cozentus.trainingtrackingapplication.model.Batch;
@@ -20,6 +21,8 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class ProgramService {
+
+	private static final String DUPLICATE = "Program Code or Program Name already exists.";
 
 	private ProgramRepository programRepository;
 
@@ -55,13 +58,23 @@ public class ProgramService {
 			managedCourses.add(managedCourse);
 		}
 		program.setCourses(managedCourses);
-		return programRepository.save(program);
+		try {
+			return programRepository.save(program);
+		} catch (DataIntegrityViolationException e) {
+			throw new DataIntegrityViolationException(DUPLICATE);
+		}
 	}
 
 	public Program editProgram(Integer programId, Program program) {
 		Optional<Program> updatedProgramOpt = programRepository.findById(programId);
 
 		if (updatedProgramOpt.isPresent()) {
+
+			if (programRepository.existsByProgramCode(program.getProgramCode())
+					|| programRepository.existsByProgramName(program.getProgramName())) {
+				throw new DataIntegrityViolationException(DUPLICATE);
+			}
+
 			Program programToUpdate = updatedProgramOpt.get();
 			List<Course> existingCourses = programToUpdate.getCourses();
 			List<Course> newCourses = program.getCourses();
@@ -90,8 +103,7 @@ public class ProgramService {
 
 			return programRepository.save(programToUpdate);
 		}
-
-		return null;
+		throw new EntityNotFoundException("Invalid Program Id");
 	}
 
 	@Transactional

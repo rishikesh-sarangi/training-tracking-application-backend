@@ -3,6 +3,7 @@ package com.cozentus.trainingtrackingapplication.controllers;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -41,17 +42,27 @@ public class BatchController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Batch> createBatch(@RequestBody Batch batch) {
-		Optional<Batch> createdBatch = Optional.ofNullable(batchService.addBatch(batch));
-		return createdBatch.map(value -> new ResponseEntity<>(value, HttpStatus.CREATED))
-				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+	public ResponseEntity<Object> createBatch(@RequestBody Batch batch) {
+		try {
+			Batch createdBatch = batchService.addBatch(batch);
+			return new ResponseEntity<>(createdBatch, HttpStatus.CREATED);
+		} catch (DataIntegrityViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		} catch (RuntimeException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@PutMapping("/{batchId}")
-	public ResponseEntity<Batch> updateBatch(@PathVariable Integer batchId, @RequestBody Batch batch) {
-		Optional<Batch> updatedBatch = Optional.ofNullable(batchService.editBatch(batchId, batch));
-		return updatedBatch.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-				.orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+	public ResponseEntity<Object> updateBatch(@PathVariable Integer batchId, @RequestBody Batch batch) {
+		try {
+			Batch createdBatch = batchService.editBatch(batchId, batch);
+			return new ResponseEntity<>(createdBatch, HttpStatus.CREATED);
+		} catch (DataIntegrityViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		} catch (RuntimeException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@Transactional

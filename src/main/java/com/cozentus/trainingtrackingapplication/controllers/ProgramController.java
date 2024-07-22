@@ -2,6 +2,8 @@ package com.cozentus.trainingtrackingapplication.controllers;
 
 import java.util.List;
 import java.util.Optional;
+
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cozentus.trainingtrackingapplication.model.Program;
 import com.cozentus.trainingtrackingapplication.service.ProgramService;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @CrossOrigin("http://localhost:4200/")
@@ -40,21 +44,31 @@ public class ProgramController {
 	}
 
 	@PostMapping
-	public ResponseEntity<Program> createProgram(@RequestBody Program program) {
-		Optional<Program> createdProgram = Optional.ofNullable(programService.addProgram(program));
-		if (createdProgram.isPresent()) {
-			return new ResponseEntity<>(createdProgram.get(), HttpStatus.CREATED);
+	public ResponseEntity<Object> createProgram(@RequestBody Program program) {
+		try {
+			Program createdProgram = programService.addProgram(program);
+			return new ResponseEntity<>(createdProgram, HttpStatus.CREATED);
+		} catch (DataIntegrityViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		} catch (RuntimeException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@PutMapping("/{programId}")
-	public ResponseEntity<Program> updateProgram(@PathVariable Integer programId, @RequestBody Program program) {
-		Optional<Program> updatedProgram = Optional.ofNullable(programService.editProgram(programId, program));
-		if (updatedProgram.isPresent()) {
-			return new ResponseEntity<>(updatedProgram.get(), HttpStatus.OK);
+	public ResponseEntity<Object> updateProgram(@PathVariable Integer programId, @RequestBody Program program) {
+		try {
+			Program updatedProgram = programService.editProgram(programId, program);
+			return new ResponseEntity<>(updatedProgram, HttpStatus.OK);
+		} catch (DataIntegrityViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
 		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		catch(EntityNotFoundException e){
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		}
+		catch (RuntimeException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@DeleteMapping("/{programId}")

@@ -3,6 +3,7 @@ package com.cozentus.trainingtrackingapplication.controllers;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,6 +21,8 @@ import com.cozentus.trainingtrackingapplication.dto.CoursesWithTopicsDTO;
 import com.cozentus.trainingtrackingapplication.model.Course;
 import com.cozentus.trainingtrackingapplication.service.CourseService;
 import com.cozentus.trainingtrackingapplication.util.ResponseUtil;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @RestController
 @CrossOrigin("http://localhost:4200/")
@@ -41,13 +44,16 @@ public class CourseController {
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
-	@PostMapping()
-	public ResponseEntity<Course> createCourse(@RequestBody Course course) {
-		Optional<Course> createdCourse = Optional.ofNullable(courseService.addCourse(course));
-		if (createdCourse.isPresent()) {
-			return new ResponseEntity<>(createdCourse.get(), HttpStatus.CREATED);
+	@PostMapping
+	public ResponseEntity<Object> createCourse(@RequestBody Course course) {
+		try {
+			Course savedCourse = courseService.addCourse(course);
+			return new ResponseEntity<>(savedCourse, HttpStatus.CREATED);
+		} catch (DataIntegrityViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		} catch (RuntimeException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@DeleteMapping("/{courseId}")
@@ -60,12 +66,17 @@ public class CourseController {
 	}
 
 	@PutMapping("/{courseId}")
-	public ResponseEntity<Course> updateCourse(@RequestBody Course course, @PathVariable Integer courseId) {
-		Optional<Course> updatedCourse = Optional.of(courseService.updateCourse(course, courseId));
-		if (updatedCourse.isPresent()) {
-			return new ResponseEntity<>(updatedCourse.get(), HttpStatus.OK);
+	public ResponseEntity<Object> updateCourse(@RequestBody Course course, @PathVariable Integer courseId) {
+		try {
+			Course updatedCourse = courseService.updateCourse(course, courseId);
+			return new ResponseEntity<>(updatedCourse, HttpStatus.CREATED);
+		} catch (EntityNotFoundException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+		} catch (DataIntegrityViolationException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		} catch (RuntimeException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 	}
 
 	@PostMapping("/by-batch-program-teacher")
